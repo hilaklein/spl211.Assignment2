@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.MessageBus;
+import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 
 /**
@@ -11,9 +13,12 @@ import bgu.spl.mics.MicroService;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class R2D2Microservice extends MicroService {
+    //private MessageBus messageBus;
 
     public R2D2Microservice(long duration) {
         super("R2D2");
+        //messageBus = new MessageBusImpl();
+        //messageBus.register(this);
     }
 
     @Override

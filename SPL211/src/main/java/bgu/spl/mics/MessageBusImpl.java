@@ -13,7 +13,8 @@ import java.util.LinkedList;
  */
 public class MessageBusImpl implements MessageBus {
 	
-	
+	//singleton constructor has to be added here
+
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
 		

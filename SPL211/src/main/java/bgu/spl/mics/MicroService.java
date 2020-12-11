@@ -18,15 +18,15 @@ package bgu.spl.mics;
  * Only private fields and methods may be added to this class.
  * <p>
  */
-public abstract class MicroService implements Runnable { 
-    
+public abstract class MicroService implements Runnable {
+    private MessageBus messageBus;
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
      *             does not have to be unique)
      */
     public MicroService(String name) {
-    	
+        messageBus = new MessageBusImpl();
     }
 
     /**
@@ -51,7 +51,6 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
-    	
     }
 
     /**
@@ -146,7 +145,8 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-    	
+        messageBus.register(this);
+        this.initialize();
     }
 
 }

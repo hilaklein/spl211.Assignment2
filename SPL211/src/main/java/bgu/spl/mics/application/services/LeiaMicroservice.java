@@ -3,6 +3,8 @@ package bgu.spl.mics.application.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import bgu.spl.mics.MessageBus;
+import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.passiveObjects.Attack;
 import  bgu.spl.mics.application.messages.AttackEvent;
@@ -17,14 +19,14 @@ import  bgu.spl.mics.application.messages.AttackEvent;
  */
 public class LeiaMicroservice extends MicroService {
 	private Attack[] attacks;
-	
+
     public LeiaMicroservice(Attack[] attacks) {
         super("Leia");
-		this.attacks = attacks;
+
     }
 
     @Override
     protected void initialize() {
-    	
+    	subscribeEvent();
     }
 }
