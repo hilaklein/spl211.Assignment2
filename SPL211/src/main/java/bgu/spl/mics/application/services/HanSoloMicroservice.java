@@ -1,10 +1,7 @@
 package bgu.spl.mics.application.services;
 
 
-import bgu.spl.mics.Callback;
-import bgu.spl.mics.MessageBus;
-import bgu.spl.mics.MessageBusImpl;
-import bgu.spl.mics.MicroService;
+import bgu.spl.mics.*;
 import  bgu.spl.mics.application.messages.AttackEvent;
 
 
@@ -23,16 +20,17 @@ public class HanSoloMicroservice extends MicroService {
 
     }
 
-
     @Override
     protected void initialize() {
         Callback callback = new Callback() {
             @Override
             public void call(Object c) {
                 Thread.sleep();
+                //Future handling can be done here - office hours remark
             }
         }
 
         subscribeEvent(AttackEvent.class, );
     }
+
 }
