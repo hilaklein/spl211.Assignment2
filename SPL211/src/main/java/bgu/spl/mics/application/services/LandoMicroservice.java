@@ -10,12 +10,10 @@ import bgu.spl.mics.MicroService;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class LandoMicroservice  extends MicroService {
-    //private MessageBus messageBus;
 
     public LandoMicroservice(long duration) {
         super("Lando");
-        //messageBus = new MessageBusImpl();
-        //messageBus.register(this);
+        /* !!!!!!!!Lando can be the class that sends Broadcast message so every other microservices (threads) could terminate themselves!!!!!!!!! */
     }
 
     @Override

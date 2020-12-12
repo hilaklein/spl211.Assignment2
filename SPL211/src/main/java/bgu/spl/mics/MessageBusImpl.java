@@ -14,6 +14,16 @@ import java.util.LinkedList;
 public class MessageBusImpl implements MessageBus {
 	
 	//singleton constructor has to be added here
+	private static MessageBusImpl instance;
+
+	private MessageBusImpl(){}
+
+	public static MessageBusImpl getInstance(){
+		if (MessageBusImpl.instance == null) //maybe we need to synchronize here so the method will not stop in the middle of the creation!!!!!!!!!!!!!!!!
+			MessageBusImpl.instance = new MessageBusImpl();
+		return MessageBusImpl.instance;
+	}
+
 
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
