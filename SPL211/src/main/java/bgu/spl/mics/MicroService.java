@@ -157,10 +157,9 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-        //take message and call the demanded callback function - office hours
-        //take message -> receive the event
-        //depending on the type of the event, desired callback function will be called from the 'demandedCallback'
 
+        //1. pull the message from the queue
+        //2. call the relevant callback()
 
         //then where does this happen??????????:
         messageBus.register(this);//??????????
