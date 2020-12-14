@@ -1,11 +1,11 @@
 package bgu.spl.mics.application.services;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-import bgu.spl.mics.MessageBus;
-import bgu.spl.mics.MessageBusImpl;
-import bgu.spl.mics.MicroService;
+import bgu.spl.mics.*;
+import bgu.spl.mics.application.messages.TerminationBroadcast;
 import bgu.spl.mics.application.passiveObjects.Attack;
 import  bgu.spl.mics.application.messages.AttackEvent;
 
@@ -22,21 +22,19 @@ public class LeiaMicroservice extends MicroService {
 
     public LeiaMicroservice(Attack[] attacks) {
         super("Leia");
-
+        this.attacks = attacks;
     }
 
     @Override
     protected void initialize() {
     	//subscribeEvent();
-
-//    	AttackEvent atEv = new AttackEvent();
-//    	synchronized (eventLock) {
-//            while (sendEvent(atEv) == null) {
-//                try { this.wait(); }
-//                catch (InterruptedException e) {}
-//            }
-//        }
-
+        Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
+            @Override
+            public void call(TerminationBroadcast c) {
+                terminate();
+            }
+        };
+        subscribeBroadcast(TerminationBroadcast.class, callTerminate);
 
     	// List<Future<T>> futures
         // foreach (sends atack events){
@@ -45,11 +43,17 @@ public class LeiaMicroservice extends MicroService {
         //        futures.add(currFuture)
         //}
 
+        List<Future<Boolean>> futures = new LinkedList<>();
+        for (Attack tempAt : attacks){
+
+        }
+
         // waiting for Futures to be done
         // sends deactivationEvent
         // waits for it to be done
         //sends bombEvent
         //waits for it to be done
         //terminate everyone by terminationEvent
+
     }
 }

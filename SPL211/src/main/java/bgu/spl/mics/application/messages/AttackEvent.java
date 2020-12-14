@@ -14,7 +14,7 @@ public class AttackEvent implements Event<Boolean> {
     }
 
     public List<Integer> getEwoksId() {
-        return ewoksId;
+        return ewokSerials;
     }
 
 
@@ -25,6 +25,6 @@ public class AttackEvent implements Event<Boolean> {
     public AttackEvent(int duration, List<Integer> ewoksId) {
         this.result = false;
         this.duration = duration;
-        this.ewoksId = ewoksId;
+        this.ewokSerials = ewoksId;
     }
 }

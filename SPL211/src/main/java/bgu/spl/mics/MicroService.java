@@ -163,6 +163,7 @@ public abstract class MicroService implements Runnable {
     public final void run() {
         //1. pull the message from the queue
         //2. call the relevant callback()
+
         messageBus.register(this);
         this.initialize();
         while (flag){

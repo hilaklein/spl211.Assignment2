@@ -5,6 +5,9 @@ import bgu.spl.mics.application.messages.testBroadcast;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -35,7 +38,10 @@ class MessageBusImplTest {
 
     @Test
     void testComplete() {
-        AttackEvent attackEvent = new AttackEvent();
+        List<Integer> tempEwoks = new LinkedList<>();
+        tempEwoks.add(1);
+        tempEwoks.add(2);
+        AttackEvent attackEvent = new AttackEvent(1000, tempEwoks);
         Callback callback = c -> {};
         microService1.subscribeEvent(attackEvent.getClass(),callback);
         Future future = new Future();
@@ -67,7 +73,10 @@ class MessageBusImplTest {
     void testSendEvent() {
 
         Callback callback = c -> {};
-        AttackEvent attackEvent = new AttackEvent();
+        List<Integer> tempEwoks = new LinkedList<>();
+        tempEwoks.add(1);
+        tempEwoks.add(2);
+        AttackEvent attackEvent = new AttackEvent(1000, tempEwoks);
         microService1.subscribeEvent(attackEvent.getClass(), callback);
         microService2.sendEvent(attackEvent);
         Message m = new Message() {
