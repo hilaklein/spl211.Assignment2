@@ -8,6 +8,17 @@ import bgu.spl.mics.application.services.R2D2Microservice;
 
 public class Input {
     public Attack[] attacks;
+    public R2D2Microservice R2D2;
+    public LandoMicroservice Lando;
+    public Ewoks Ewoks;
+
+    private static class SingletonHolder{
+        private static Input instance = new Input();
+    }
+
+    public static Input getInstance(){
+        return SingletonHolder.instance;
+    }
 
     public void setAttacks(Attack[] attacks) {
         this.attacks = attacks;
@@ -37,13 +48,9 @@ public class Input {
         return Lando;
     }
 
-    public bgu.spl.mics.application.passiveObjects.Ewoks getEwoks() {
+    public Ewoks getEwoks() {
         return Ewoks;
     }
-
-    public R2D2Microservice R2D2;
-    public LandoMicroservice Lando;
-    public Ewoks Ewoks;
 
 
 }

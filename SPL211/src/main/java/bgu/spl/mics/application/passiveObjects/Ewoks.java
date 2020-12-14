@@ -11,11 +11,16 @@ package bgu.spl.mics.application.passiveObjects;
  */
 public class Ewoks {
     private Ewok[] ewoks;
+
     public Ewoks(int numOfEwoks){
         ewoks = new Ewok[numOfEwoks];
         for (int i = 0; i < numOfEwoks; i++){
             ewoks[i] = new Ewok(i);
         }
+    }
+
+    public Ewok[] getEwoksArr(){
+        return this.ewoks;
     }
 
 }

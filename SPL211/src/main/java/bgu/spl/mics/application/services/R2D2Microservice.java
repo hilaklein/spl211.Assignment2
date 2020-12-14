@@ -1,8 +1,12 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.Callback;
 import bgu.spl.mics.MessageBus;
 import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.messages.AttackEvent;
+import bgu.spl.mics.application.messages.DeactivationEvent;
+import bgu.spl.mics.application.messages.TerminationBroadcast;
 
 /**
  * R2D2Microservices is in charge of the handling {@link DeactivationEvent}.
@@ -13,16 +17,33 @@ import bgu.spl.mics.MicroService;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class R2D2Microservice extends MicroService {
-    //private MessageBus messageBus;
+
+    private long duration;
 
     public R2D2Microservice(long duration) {
         super("R2D2");
-        //messageBus = new MessageBusImpl();
-        //messageBus.register(this);
+        this.duration = duration;
     }
 
     @Override
     protected void initialize() {
+        Callback<DeactivationEvent> deactEvent = new Callback<DeactivationEvent>() {
+            @Override
+            public void call(DeactivationEvent c) {
+                try {
+                    Thread.currentThread().sleep(duration);
+                } catch (InterruptedException e) { }
+                complete(c, true);
+            }
+        };
+        subscribeEvent(DeactivationEvent.class, deactEvent);
 
+        Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
+            @Override
+            public void call(TerminationBroadcast c) {
+                terminate();
+            }
+        };
+        subscribeBroadcast(TerminationBroadcast.class, callTerminate);
     }
 }

@@ -23,9 +23,8 @@ import java.util.HashMap;
 public abstract class MicroService implements Runnable {
     private MessageBus messageBus;
     private String name;
-    private HashMap<Class, Callback> demandedCallback;
+    private HashMap<Class, Callback> demandedCallback; //make it safe later
     private boolean flag;
-    protected Object eventLock;
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
@@ -60,11 +59,8 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
-        synchronized (eventLock) {
             messageBus.subscribeEvent(type, this);
             demandedCallback.put(type, callback);
-            notifyAll();
-        }
     }
 
     /**
@@ -105,16 +101,11 @@ public abstract class MicroService implements Runnable {
      * 	       			null in case no micro-service has subscribed to {@code e.getClass()}.
      */
     protected final <T> Future<T> sendEvent(Event<T> e) {
-
         //check via messageBus if someone is subscribed to this event
         // if no one is subscribed, this method is going to sleep untill someone is subscribed
 
-
         //while (sendEvent == null)
         // return output
-
-
-
 
     	return messageBus.sendEvent(e);
     }
@@ -126,8 +117,7 @@ public abstract class MicroService implements Runnable {
      * @param b The broadcast message to send
      */
     protected final void sendBroadcast(Broadcast b) {
-        if (demandedCallback.containsKey(b.getClass()))
-            messageBus.sendBroadcast(b);
+        messageBus.sendBroadcast(b);
     }
 
     /**
@@ -171,21 +161,17 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-
         //1. pull the message from the queue
         //2. call the relevant callback()
+        messageBus.register(this);
+        this.initialize();
+        while (flag){
+            try {
+                Message currMsg = messageBus.awaitMessage(this);
+                demandedCallback.get(currMsg.getClass()).call(currMsg);
+            }catch (InterruptedException e) {}
+        }
 
-
-
-        /*while(flag is true){
-        * try (awaitMessage) catch (excp)
-        * }
-        */
-
-
-        //then where does this happen??????????:
-        messageBus.register(this);//??????????
-        this.initialize();//?????????????????
     }
 
 }

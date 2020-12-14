@@ -26,7 +26,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		//args[0] - path to input
 		//args[1] - path and name to output
-		Input input = new Input();
+		Input input = Input.getInstance();
 		init(args[0], input);
 		LeiaMicroservice leia = new LeiaMicroservice(input.getAttacks());
 

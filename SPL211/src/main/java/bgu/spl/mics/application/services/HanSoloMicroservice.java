@@ -2,7 +2,12 @@ package bgu.spl.mics.application.services;
 
 
 import bgu.spl.mics.*;
+import bgu.spl.mics.application.Input;
 import  bgu.spl.mics.application.messages.AttackEvent;
+import bgu.spl.mics.application.messages.TerminationBroadcast;
+import bgu.spl.mics.application.passiveObjects.Ewok;
+
+import java.util.List;
 
 
 /**
@@ -17,23 +22,37 @@ public class HanSoloMicroservice extends MicroService {
 
     public HanSoloMicroservice() {
         super("Han");
-
     }
 
 
     @Override
-    protected void initialize() {
-        //we need to define here what kind of the messages we want to receive and how the callback will respond to different kind of messages
-        //so, eventually we need to:
-        // define here different scenarios of callbacks (regarding different types of messages a.k.a events/broadcasts)
-        // send those callback classes with the relevant type of event to super.subscribeEvent/Broadcast(Class type, Callback c)
-        // then we call the super.run() function, so the cycle of "PullingMessagesFromQueueAndResolveThemWithRelevantCallbacks" will begin
+    protected void initialize()  {
+        Callback<AttackEvent> callAttack = new Callback<AttackEvent>() {
+            @Override
+            public void call(AttackEvent attackEvent) {
+                List<Integer> ewokList = attackEvent.getEwoksId();
+                Ewok[] tempEw = Input.getInstance().getEwoks().getEwoksArr();
+                for (Integer tempId : ewokList){
+                    tempEw[tempId].acquire();
+                }
+                try {
+                    Thread.currentThread().sleep(attackEvent.getDuration().longValue());
+                }catch (InterruptedException e) {}
+                for (Integer tempId : ewokList){
+                    tempEw[tempId].release();
+                }
+                complete(attackEvent, true);
+            }
+        };
+        subscribeEvent(AttackEvent.class, callAttack);
 
 
-        // Callback c1 {anonym class }
-        //subscribeEvent (attackEv.getCLass, c1)
-        // Callback c2 {anonym class }
-        //subscribeTermination (terminationEv.getclass, c2);
-
+        Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
+            @Override
+            public void call(TerminationBroadcast c) {
+                terminate();
+            }
+        };
+        subscribeBroadcast(TerminationBroadcast.class, callTerminate);
     }
 }

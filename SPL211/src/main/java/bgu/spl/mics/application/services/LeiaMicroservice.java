@@ -29,13 +29,13 @@ public class LeiaMicroservice extends MicroService {
     protected void initialize() {
     	//subscribeEvent();
 
-    	AttackEvent atEv = new AttackEvent();
-    	synchronized (eventLock) {
-            while (sendEvent(atEv) == null) {
-                try { this.wait(); }
-                catch (InterruptedException e) {}
-            }
-        }
+//    	AttackEvent atEv = new AttackEvent();
+//    	synchronized (eventLock) {
+//            while (sendEvent(atEv) == null) {
+//                try { this.wait(); }
+//                catch (InterruptedException e) {}
+//            }
+//        }
 
 
     	// List<Future<T>> futures
