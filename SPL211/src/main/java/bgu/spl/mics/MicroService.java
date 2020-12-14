@@ -24,15 +24,18 @@ public abstract class MicroService implements Runnable {
     private MessageBus messageBus;
     private String name;
     private HashMap<Class, Callback> demandedCallback;
+    private boolean flag;
+    protected Object eventLock;
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
      *             does not have to be unique)
      */
     public MicroService(String name) {
-        messageBus = new MessageBusImpl();
+        messageBus = MessageBusImpl.getInstance();
         demandedCallback = new HashMap<>();
         this.name = name;
+        flag = true;
     }
 
     /**
@@ -57,8 +60,11 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
-        messageBus.subscribeEvent(type, this);
-        demandedCallback.put(type, callback);
+        synchronized (eventLock) {
+            messageBus.subscribeEvent(type, this);
+            demandedCallback.put(type, callback);
+            notifyAll();
+        }
     }
 
     /**
@@ -99,8 +105,17 @@ public abstract class MicroService implements Runnable {
      * 	       			null in case no micro-service has subscribed to {@code e.getClass()}.
      */
     protected final <T> Future<T> sendEvent(Event<T> e) {
-    	if (!demandedCallback.containsKey(e.getClass()))
-    	    return null;
+
+        //check via messageBus if someone is subscribed to this event
+        // if no one is subscribed, this method is going to sleep untill someone is subscribed
+
+
+        //while (sendEvent == null)
+        // return output
+
+
+
+
     	return messageBus.sendEvent(e);
     }
 
@@ -139,8 +154,7 @@ public abstract class MicroService implements Runnable {
      * message.
      */
     protected final void terminate() {
-    	this.terminate();
-    	//maybe add some field which will be the sync-key of the object???????????????????????????????????????
+        flag = false;
     }
 
     /**
@@ -160,6 +174,14 @@ public abstract class MicroService implements Runnable {
 
         //1. pull the message from the queue
         //2. call the relevant callback()
+
+
+
+        /*while(flag is true){
+        * try (awaitMessage) catch (excp)
+        * }
+        */
+
 
         //then where does this happen??????????:
         messageBus.register(this);//??????????

@@ -15,7 +15,7 @@ class MessageBusImplTest {
     MicroService microService2;
     @BeforeEach
     void setUp() {
-        messageBus = new MessageBusImpl();
+        messageBus = MessageBusImpl.getInstance();
 
         microService1 = new MicroService("SendTest") {
             @Override

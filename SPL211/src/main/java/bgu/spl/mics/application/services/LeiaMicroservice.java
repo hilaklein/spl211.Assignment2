@@ -27,6 +27,29 @@ public class LeiaMicroservice extends MicroService {
 
     @Override
     protected void initialize() {
-    	subscribeEvent();
+    	//subscribeEvent();
+
+    	AttackEvent atEv = new AttackEvent();
+    	synchronized (eventLock) {
+            while (sendEvent(atEv) == null) {
+                try { this.wait(); }
+                catch (InterruptedException e) {}
+            }
+        }
+
+
+    	// List<Future<T>> futures
+        // foreach (sends atack events){
+        //        cuurFuture = new Future
+        //        while (currFuture == null) { try: currrFuture = sendEvent(attackEv1), catch  }
+        //        futures.add(currFuture)
+        //}
+
+        // waiting for Futures to be done
+        // sends deactivationEvent
+        // waits for it to be done
+        //sends bombEvent
+        //waits for it to be done
+        //terminate everyone by terminationEvent
     }
 }

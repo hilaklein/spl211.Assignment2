@@ -20,6 +20,7 @@ public class HanSoloMicroservice extends MicroService {
 
     }
 
+
     @Override
     protected void initialize() {
         //we need to define here what kind of the messages we want to receive and how the callback will respond to different kind of messages
@@ -28,15 +29,11 @@ public class HanSoloMicroservice extends MicroService {
         // send those callback classes with the relevant type of event to super.subscribeEvent/Broadcast(Class type, Callback c)
         // then we call the super.run() function, so the cycle of "PullingMessagesFromQueueAndResolveThemWithRelevantCallbacks" will begin
 
-        Callback callback = new Callback() {
-            @Override
-            public void call(Object c) {
-                Thread.sleep();
-                //Future handling can be done here - office hours remark
-            }
-        }
 
-        subscribeEvent(AttackEvent.class, );
+        // Callback c1 {anonym class }
+        //subscribeEvent (attackEv.getCLass, c1)
+        // Callback c2 {anonym class }
+        //subscribeTermination (terminationEv.getclass, c2);
+
     }
-
 }

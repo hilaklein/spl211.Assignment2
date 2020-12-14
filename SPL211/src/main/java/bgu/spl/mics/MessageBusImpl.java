@@ -16,6 +16,10 @@ public class MessageBusImpl implements MessageBus {
 	//singleton constructor has to be added here
 	private static MessageBusImpl instance;
 
+	//blocking queue for every Microservice
+	// keyToSendEvent which is managed by subscribe event
+	//
+
 	private MessageBusImpl(){}
 
 	public static MessageBusImpl getInstance(){
@@ -27,7 +31,9 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
-		
+		//create a blocking queue for the Microservice which has sent this Event
+		//add this Microservice to HashMap<someEventClass, microservice>
+		//release the blocking of the sendEvent for this type of Event
 	}
 
 	@Override
@@ -48,7 +54,7 @@ public class MessageBusImpl implements MessageBus {
 	
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
-		
+		//while (!subscribed) return null
         return null;
 	}
 

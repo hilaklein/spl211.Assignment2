@@ -10,5 +10,12 @@ package bgu.spl.mics.application.passiveObjects;
  * You can add ONLY private methods and fields to this class.
  */
 public class Ewoks {
+    private Ewok[] ewoks;
+    public Ewoks(int numOfEwoks){
+        ewoks = new Ewok[numOfEwoks];
+        for (int i = 0; i < numOfEwoks; i++){
+            ewoks[i] = new Ewok(i);
+        }
+    }
 
 }
