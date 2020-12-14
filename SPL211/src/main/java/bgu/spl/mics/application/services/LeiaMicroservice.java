@@ -8,6 +8,7 @@ import bgu.spl.mics.*;
 import bgu.spl.mics.application.messages.TerminationBroadcast;
 import bgu.spl.mics.application.passiveObjects.Attack;
 import  bgu.spl.mics.application.messages.AttackEvent;
+import bgu.spl.mics.application.passiveObjects.Diary;
 
 /**
  * LeiaMicroservices Initialized with Attack objects, and sends them as  {@link AttackEvent}.
@@ -55,5 +56,11 @@ public class LeiaMicroservice extends MicroService {
         //waits for it to be done
         //terminate everyone by terminationEvent
 
+    }
+
+    @Override
+    protected void WriteToDiary() {
+        Diary diary = Diary.getInstance();
+        diary.setLeiaTerminate(System.currentTimeMillis());
     }
 }

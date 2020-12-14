@@ -138,6 +138,7 @@ public abstract class MicroService implements Runnable {
      * this method is called once when the event loop starts.
      */
     protected abstract void initialize();
+    protected abstract void WriteToDiary();
 
     /**
      * Signals the event loop that it must terminate after handling the current
@@ -172,6 +173,7 @@ public abstract class MicroService implements Runnable {
                 demandedCallback.get(currMsg.getClass()).call(currMsg);
             }catch (InterruptedException e) {}
         }
+
 
     }
 

@@ -7,6 +7,7 @@ import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.Input;
 import  bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.messages.TerminationBroadcast;
+import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.Ewok;
 
 import java.util.List;
@@ -45,6 +46,9 @@ public class C3POMicroservice extends MicroService {
                     tempEw[tempId].release();
                 }
                 complete(attackEvent, true);
+                Diary diary = Diary.getInstance();
+                diary.setC3POFinish(System.currentTimeMillis());
+                diary.incrementTotalAttacks();
             }
         };
         subscribeEvent(AttackEvent.class, callAttack);
@@ -57,5 +61,11 @@ public class C3POMicroservice extends MicroService {
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
+    }
+
+    @Override
+    protected void WriteToDiary() {
+        Diary diary = Diary.getInstance();
+        diary.setC3POTerminate(System.currentTimeMillis());
     }
 }

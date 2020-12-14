@@ -5,6 +5,7 @@ import bgu.spl.mics.*;
 import bgu.spl.mics.application.Input;
 import  bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.messages.TerminationBroadcast;
+import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.Ewok;
 
 import java.util.List;
@@ -42,6 +43,9 @@ public class HanSoloMicroservice extends MicroService {
                     tempEw[tempId].release();
                 }
                 complete(attackEvent, true);
+                Diary diary = Diary.getInstance();
+                diary.setHanSoloFinish(System.currentTimeMillis());
+                diary.incrementTotalAttacks();
             }
         };
         subscribeEvent(AttackEvent.class, callAttack);
@@ -51,8 +55,15 @@ public class HanSoloMicroservice extends MicroService {
             @Override
             public void call(TerminationBroadcast c) {
                 terminate();
+
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
+    }
+
+    @Override
+    protected void WriteToDiary() {
+        Diary diary = Diary.getInstance();
+        diary.setHanSoloTerminate(System.currentTimeMillis());
     }
 }

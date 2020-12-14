@@ -7,6 +7,7 @@ import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.messages.DeactivationEvent;
 import bgu.spl.mics.application.messages.TerminationBroadcast;
+import bgu.spl.mics.application.passiveObjects.Diary;
 
 /**
  * R2D2Microservices is in charge of the handling {@link DeactivationEvent}.
@@ -34,6 +35,8 @@ public class R2D2Microservice extends MicroService {
                     Thread.currentThread().sleep(duration);
                 } catch (InterruptedException e) { }
                 complete(c, true);
+                Diary diary = Diary.getInstance();
+                diary.setR2D2Deactivate(System.currentTimeMillis());
             }
         };
         subscribeEvent(DeactivationEvent.class, deactEvent);
@@ -45,5 +48,11 @@ public class R2D2Microservice extends MicroService {
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
+    }
+
+    @Override
+    protected void WriteToDiary() {
+        Diary diary = Diary.getInstance();
+        diary.setR2D2Terminate(System.currentTimeMillis());
     }
 }

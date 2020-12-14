@@ -6,6 +6,7 @@ import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.BombDestroyerEvent;
 import bgu.spl.mics.application.messages.TerminationBroadcast;
+import bgu.spl.mics.application.passiveObjects.Diary;
 
 /**
  * LandoMicroservice
@@ -44,5 +45,11 @@ public class LandoMicroservice  extends MicroService {
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
+    }
+
+    @Override
+    protected void WriteToDiary() {
+        Diary diary = Diary.getInstance();
+        diary.setLandoTerminate(System.currentTimeMillis());
     }
 }
