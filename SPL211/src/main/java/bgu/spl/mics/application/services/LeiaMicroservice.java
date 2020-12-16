@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import bgu.spl.mics.*;
+import bgu.spl.mics.application.messages.DeactivationEvent;
 import bgu.spl.mics.application.messages.TerminationBroadcast;
 import bgu.spl.mics.application.passiveObjects.Attack;
 import  bgu.spl.mics.application.messages.AttackEvent;
@@ -19,11 +20,13 @@ import bgu.spl.mics.application.passiveObjects.Diary;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class LeiaMicroservice extends MicroService {
+    private int eventID;
 	private Attack[] attacks;
 
     public LeiaMicroservice(Attack[] attacks) {
         super("Leia");
         this.attacks = attacks;
+        eventID = 0;
     }
 
     @Override
@@ -36,26 +39,25 @@ public class LeiaMicroservice extends MicroService {
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
-
-    	// List<Future<T>> futures
-        // foreach (sends atack events){
-        //        cuurFuture = new Future
-        //        while (currFuture == null) { try: currrFuture = sendEvent(attackEv1), catch  }
-        //        futures.add(currFuture)
-        //}
-
+        try {
+            Thread.currentThread().sleep(1000);
+        }
+        catch (InterruptedException exception){}
         List<Future<Boolean>> futures = new LinkedList<>();
         for (Attack tempAt : attacks){
-
+            AttackEvent attackEvent = new AttackEvent(tempAt.getDuration(),tempAt.getSerials());
+            attackEvent.setID(eventID);
+            futures.add(sendEvent(attackEvent));
+            eventID++;
         }
-
-        // waiting for Futures to be done
-        // sends deactivationEvent
-        // waits for it to be done
-        //sends bombEvent
-        //waits for it to be done
-        //terminate everyone by terminationEvent
-
+        while(!futures.isEmpty()){
+            for(Future future : futures){
+                if(future.isDone())
+                    futures.remove(future);
+            }
+        }
+        DeactivationEvent deactivationEvent = new DeactivationEvent();
+    	sendEvent(deactivationEvent);
     }
 
     @Override

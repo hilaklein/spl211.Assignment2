@@ -27,6 +27,10 @@ public class MessageBusImpl implements MessageBus {
 	//private Map<Message, Map<MicroService, BlockingQueue<Message>>> managerMap;
 	private Map<Message, BlockingQueue<MicroService>> managerMap;
 	private Map<MicroService, BlockingQueue<Message>> queueManager;
+	private Map<Integer,Future> futureMap;
+	private  Object managerMapLock;
+	private  Object queueManagerLock;
+	//private  Object managerMapLock;
 
 	//blocking queue for every Microservice
 	// keyToSendEvent which is managed by subscribe event
@@ -35,6 +39,7 @@ public class MessageBusImpl implements MessageBus {
 	private MessageBusImpl() {
 		managerMap = new HashMap<>();
 		queueManager = new HashMap<>();
+		futureMap = new HashMap<>();
 	}
 
 	public static MessageBusImpl getInstance() {
@@ -44,6 +49,10 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
+		if (!managerMap.containsKey(type)) {
+			LinkedBlockingQueue<MicroService>()
+			managerMap.put(type,
+		}
 		managerMap.get(type).add(m);
 	}
 
@@ -55,7 +64,6 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> void complete(Event<T> e, T result) {
-
 	}
 
 	@Override
@@ -68,16 +76,16 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
-		//while (!subscribed) return null
-		try {
-			MicroService tempM = managerMap.get(e).take();
-			queueManager.get(tempM).add(e);
-			managerMap.get(e).add(tempM);
-			return null; // return future object that is connected to e specified event
-		} catch (InterruptedException exc) {
-			return null;
+
+			try {
+				MicroService tempM = managerMap.get(e).take();
+				queueManager.get(tempM).add(e);
+				managerMap.get(e).add(tempM);
+				return null; // return future object that is connected to e specified event
+			} catch (InterruptedException exc) {
+				return null;
+			}
 		}
-	}
 
 	@Override
 	public void register(MicroService m) {

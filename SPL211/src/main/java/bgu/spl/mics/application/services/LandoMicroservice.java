@@ -1,9 +1,6 @@
 package bgu.spl.mics.application.services;
 
-import bgu.spl.mics.Callback;
-import bgu.spl.mics.MessageBus;
-import bgu.spl.mics.MessageBusImpl;
-import bgu.spl.mics.MicroService;
+import bgu.spl.mics.*;
 import bgu.spl.mics.application.messages.BombDestroyerEvent;
 import bgu.spl.mics.application.messages.TerminationBroadcast;
 import bgu.spl.mics.application.passiveObjects.Diary;
@@ -34,6 +31,8 @@ public class LandoMicroservice  extends MicroService {
                     Thread.currentThread().sleep(duration);
                 } catch (InterruptedException e) { }
                 complete(c, true);
+                TerminationBroadcast terminationBroadcast = new TerminationBroadcast();
+                sendBroadcast(terminationBroadcast);
             }
         };
         subscribeEvent(BombDestroyerEvent.class, bombEvent);

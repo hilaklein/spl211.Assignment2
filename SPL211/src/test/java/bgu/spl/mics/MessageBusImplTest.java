@@ -25,10 +25,20 @@ class MessageBusImplTest {
             protected void initialize() {
 
             }
+
+            @Override
+            protected void WriteToDiary() {
+
+            }
         };
         microService2 = new MicroService("receiveTest") {
             @Override
             protected void initialize() {
+
+            }
+
+            @Override
+            protected void WriteToDiary() {
 
             }
         };

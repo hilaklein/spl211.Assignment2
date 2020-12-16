@@ -5,6 +5,7 @@ import bgu.spl.mics.MessageBus;
 import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.AttackEvent;
+import bgu.spl.mics.application.messages.BombDestroyerEvent;
 import bgu.spl.mics.application.messages.DeactivationEvent;
 import bgu.spl.mics.application.messages.TerminationBroadcast;
 import bgu.spl.mics.application.passiveObjects.Diary;
@@ -35,6 +36,8 @@ public class R2D2Microservice extends MicroService {
                     Thread.currentThread().sleep(duration);
                 } catch (InterruptedException e) { }
                 complete(c, true);
+                BombDestroyerEvent bombDestroyerEvent = new BombDestroyerEvent();
+                sendEvent(bombDestroyerEvent);
                 Diary diary = Diary.getInstance();
                 diary.setR2D2Deactivate(System.currentTimeMillis());
             }
