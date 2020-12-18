@@ -33,6 +33,7 @@ public class Main {
 		Thread tHanSolo = new Thread(new HanSoloMicroservice());
 		Thread tC3po = new Thread(new C3POMicroservice());
 
+
 		tHanSolo.start();
 		tC3po.start();
 		tLeia.start();
@@ -40,6 +41,7 @@ public class Main {
 		tLando.start();
 
 		try {
+
 			tHanSolo.join();
 			tC3po.join();
 			tLeia.join();

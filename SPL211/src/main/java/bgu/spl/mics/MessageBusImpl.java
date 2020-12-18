@@ -20,6 +20,7 @@ public class MessageBusImpl implements MessageBus {
 	private Map<MicroService, BlockingQueue<Message>> queueManager;
 	private Map<Message,Future> futureMap;
 	private  Object managerMapLock;
+	private Object queueEventLock;
 
 
 	private MessageBusImpl() {
@@ -27,6 +28,7 @@ public class MessageBusImpl implements MessageBus {
 		queueManager = new HashMap<>();
 		futureMap = new HashMap<>();
 		managerMapLock = new Object();
+		queueEventLock = new Object();
 	}
 
 	public static MessageBusImpl getInstance() {
@@ -36,16 +38,21 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
-		//synchronized (managerMapLock) {
+		synchronized (managerMapLock) {
 			if (!managerMap.containsKey(type)) {
 				BlockingQueue<MicroService> toAdd = new LinkedBlockingQueue<>();
 				managerMap.put(type, toAdd);
+				managerMapLock.notifyAll();
 			}
 			managerMap.get(type).add(m);
-			BlockingQueue<Message> msgToAdd = new LinkedBlockingQueue<>();
-			queueManager.put(m, msgToAdd);
 			managerMapLock.notifyAll();
 		}
+		//synchronized (queueEventLock) {
+			BlockingQueue<Message> msgToAdd = new LinkedBlockingQueue<>();
+			queueManager.put(m, msgToAdd);
+			//queueEventLock.notifyAll();
+		//}
+	}
 	//}
 
 	@Override
@@ -54,12 +61,16 @@ public class MessageBusImpl implements MessageBus {
 			if (!managerMap.containsKey(type)) {
 				BlockingQueue<MicroService> toAdd = new LinkedBlockingQueue<>();
 				managerMap.put(type, toAdd);
+				managerMapLock.notifyAll();
 			}
 			managerMap.get(type).add(m);
-			BlockingQueue<Message> msgToAdd = new LinkedBlockingQueue<>();
-			queueManager.put(m, msgToAdd);
 			managerMapLock.notifyAll();
 		}
+		//synchronized (queueEventLock) {
+			BlockingQueue<Message> msgToAdd = new LinkedBlockingQueue<>();
+			queueManager.put(m, msgToAdd);
+			//queueEventLock.notifyAll();
+		//}
 	}
 
 	@Override
@@ -71,63 +82,61 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public void sendBroadcast(Broadcast b) {
-//		synchronized (managerMapLock) {
-//			while (!managerMap.containsKey(b.getClass())) {
-//				try {
-//					wait();
-//				} catch (InterruptedException exc) {
-//					System.out.println(	exc.getMessage());
-//				}
-//			}
-
 		synchronized (managerMapLock) {
-			for (MicroService tempM : managerMap.get(b.getClass())) {
-				queueManager.get(tempM).add(b);
-				managerMapLock.notifyAll();
+			while (!managerMap.containsKey(b.getClass())) {
+				try {
+					managerMapLock.wait();
+				} catch (InterruptedException interruptedException) {
+				}
 			}
 		}
+		//synchronized (queueEventLock) {
+		for (MicroService tempM : managerMap.get(b.getClass())) {
+				//while (!queueManager.containsKey(tempM)) {
+					//try {
+					//	queueEventLock.wait();
+					//} catch (InterruptedException interruptedException) {
+					//}
+				//}
+				queueManager.get(tempM).add(b);
+				//queueEventLock.notifyAll();
+			}
+			//queueEventLock.notifyAll();
 	}
-//	}
 
 
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
-//		synchronized (managerMapLock) {
-//			while (!managerMap.containsKey(e.getClass())) {
-//				try {
-//					wait();
-//				} catch (InterruptedException exception) {
-//					System.out.println(	exception.getMessage());
-//				}
-//			}
-
-			try {
-				MicroService tempM = managerMap.get(e.getClass()).take(); //part 1 of round robin method
-				synchronized (managerMapLock) {
-					queueManager.get(tempM).add(e);
-					managerMap.get(e.getClass()).add(tempM); //part 2 of round robin method
-					managerMapLock.notifyAll();
+		synchronized (managerMapLock) {
+			while (!managerMap.containsKey(e.getClass())) {
+				try {
+					managerMapLock.wait();
+				} catch (InterruptedException exception) {
+					System.out.println("send event: " + exception.getMessage());
 				}
-
-
-				Future<T> future = new Future<>();
-				futureMap.put(e, future);
-				return future; // return future object that is connected to e specified event
-			} catch (Exception exc) { // changed instead of InterruptedException
-				System.out.println(exc.getMessage());
-				return null;
 			}
-
-		}
-
+				try {
+					MicroService tempM = managerMap.get(e.getClass()).take();
+					queueManager.get(tempM).add(e);
+					//queueEventLock.notifyAll();
+					managerMap.get(e.getClass()).add(tempM);
+					managerMapLock.notifyAll();
+				} catch (Exception ex) {
+				}
+			}
+			Future<T> future = new Future<>();
+			futureMap.put(e, future);
+			return future; // return future object that is connected to e specified event
+	}
 	//}
 
 
 	@Override
 	public void register(MicroService m) {
 		BlockingQueue<Message> tempBQ = new LinkedBlockingQueue<>();
-		queueManager.put(m, tempBQ);
-	}
+			queueManager.put(m, tempBQ);
+			//queueEventLock.notifyAll();
+		}
 
 	@Override
 	public void unregister(MicroService m) {
@@ -140,11 +149,11 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {
 		System.out.println("awaitMessage() called in msgBus");
-		synchronized (managerMapLock) {
-			while (queueManager.get(m).isEmpty()){
-				System.out.println(	"msgBus: await: while: " + Thread.currentThread().getName());
-				Thread.currentThread().wait();
-			}
+		//synchronized (queueEventLock) {
+//			while (queueManager.get(m).isEmpty()) {
+//				System.out.println("msgBus: await: while: " + Thread.currentThread().getName() +"this is "+ this);
+//				queueEventLock.wait();
+//			}
 			try {
 				return queueManager.get(m).take();
 			} catch (Exception exp) {
@@ -152,5 +161,5 @@ public class MessageBusImpl implements MessageBus {
 				return null;
 			}
 		}
-	}
+	//}
 }
