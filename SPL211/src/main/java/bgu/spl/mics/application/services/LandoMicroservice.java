@@ -40,6 +40,7 @@ public class LandoMicroservice  extends MicroService {
         Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
             @Override
             public void call(TerminationBroadcast c) {
+                WriteToDiary();
                 terminate();
             }
         };

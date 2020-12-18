@@ -16,24 +16,16 @@ public class MessageBusImpl implements MessageBus {
 		private static MessageBusImpl instance = new MessageBusImpl();
 	}
 
-	//private Map<Message, Map<MicroService, BlockingQueue<Message>>> managerMap;
 	private Map<Class<? extends Message>, BlockingQueue<MicroService>> managerMap;
 	private Map<MicroService, BlockingQueue<Message>> queueManager;
 	private Map<Message,Future> futureMap;
 	private  Object managerMapLock;
-	private  Object queueManagerLock;
-	private  Object futureMapLock;
 
-	//blocking queue for every Microservice
-	// keyToSendEvent which is managed by subscribe event
-	//
 
 	private MessageBusImpl() {
 		managerMap = new HashMap<>();
 		queueManager = new HashMap<>();
 		futureMap = new HashMap<>();
-		futureMapLock = new Object();
-		queueManagerLock = new Object();
 		managerMapLock = new Object();
 	}
 
@@ -100,22 +92,22 @@ public class MessageBusImpl implements MessageBus {
 			while (!managerMap.containsKey(e)) {
 				try {
 					Thread.currentThread().wait();
-				} catch (InterruptedException exception) {
-				}
-
-				try {
-					MicroService tempM = managerMap.get(e).take(); //part 1 of round robin method
-					queueManager.get(tempM).add(e);
-					managerMap.get(e).add(tempM); //part 2 of round robin method
-					Future<T> future = new Future<>();
-					futureMap.put(e, future);
-					return future; // return future object that is connected to e specified event
-				} catch (Exception exc) { // changed instead of InterruptedException
-					return null;
-				}
+				} catch (InterruptedException exception) { }
 			}
+
+			try {
+				MicroService tempM = managerMap.get(e).take(); //part 1 of round robin method
+				queueManager.get(tempM).add(e);
+				managerMap.get(e).add(tempM); //part 2 of round robin method
+				Future<T> future = new Future<>();
+				futureMap.put(e, future);
+				return future; // return future object that is connected to e specified event
+			} catch (Exception exc) { // changed instead of InterruptedException
+				return null;
+			}
+
 		}
-		return null;
+
 	}
 
 

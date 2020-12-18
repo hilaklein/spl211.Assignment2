@@ -42,6 +42,14 @@ public class Main {
 		tR2d2.start();
 		tLando.start();
 
+		try {
+			tHanSolo.join();
+			tC3po.join();
+			tLeia.join();
+			tR2d2.join();
+			tLando.join();
+		} catch (InterruptedException e) {}
+
 		createOutput(args[1]);
 		System.out.println(	"end!!!!!!!!!!!!!!!!!!!!!!!!!!11");
 		//System.exit(0);

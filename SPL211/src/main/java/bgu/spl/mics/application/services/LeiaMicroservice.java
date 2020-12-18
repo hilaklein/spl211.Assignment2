@@ -32,22 +32,23 @@ public class LeiaMicroservice extends MicroService {
         Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
             @Override
             public void call(TerminationBroadcast c) {
+                WriteToDiary();
                 terminate();
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
-        try {
-            Thread.currentThread().sleep(1000);
-        }
-        catch (InterruptedException exception){}
+//        try {
+//            Thread.currentThread().sleep(1000);
+//        }
+//        catch (InterruptedException exception){}
         List<Future<Boolean>> futures = new LinkedList<>();
         for (Attack tempAt : attacks){
             AttackEvent attackEvent = new AttackEvent(tempAt.getDuration(),tempAt.getSerials());
-            futures.add(sendEvent(attackEvent)); // if leia receives a copy of Future class, how does shhe knows it's updated????????????/
+            futures.add(sendEvent(attackEvent));
         }
         while(!futures.isEmpty()){
             for(Future future : futures){
-                if(future != null && future.isDone()) // added future != null -> nullPointerException
+                if(future.isDone())
                     futures.remove(future);
             }
         }
