@@ -44,7 +44,7 @@ public class MessageBusImpl implements MessageBus {
 			managerMap.get(type).add(m);
 			BlockingQueue<Message> msgToAdd = new LinkedBlockingQueue<>();
 			queueManager.put(m, msgToAdd);
-			notifyAll();
+			managerMapLock.notifyAll();
 		}
 	}
 
@@ -58,7 +58,7 @@ public class MessageBusImpl implements MessageBus {
 			managerMap.get(type).add(m);
 			BlockingQueue<Message> msgToAdd = new LinkedBlockingQueue<>();
 			queueManager.put(m, msgToAdd);
-			notifyAll();
+			managerMapLock.notifyAll();
 		}
 	}
 
