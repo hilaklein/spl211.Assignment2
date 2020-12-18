@@ -51,7 +51,9 @@ public class LeiaMicroservice extends MicroService {
                 if(future.isDone())
                     futures.remove(future);
             }
+
         }
+        System.out.println("Leia: line 57");
         DeactivationEvent deactivationEvent = new DeactivationEvent();
     	sendEvent(deactivationEvent);
     }
