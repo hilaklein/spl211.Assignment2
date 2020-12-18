@@ -42,9 +42,9 @@ public class Main {
 		tR2d2.start();
 		tLando.start();
 
-		createOutput(args[0]); //change to args[1]!!!!!!!!!!!!!!!!!!!!!!
+		createOutput(args[1]);
 		System.out.println(	"end!!!!!!!!!!!!!!!!!!!!!!!!!!11");
-		System.exit(0);
+		//System.exit(0);
 		//sysytem doesnt stop here...why??????????????????????????????
 
 	}

@@ -20,13 +20,11 @@ import bgu.spl.mics.application.passiveObjects.Diary;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class LeiaMicroservice extends MicroService {
-    private int eventID;
 	private Attack[] attacks;
 
     public LeiaMicroservice(Attack[] attacks) {
         super("Leia");
         this.attacks = attacks;
-        eventID = 0;
     }
 
     @Override
@@ -45,9 +43,7 @@ public class LeiaMicroservice extends MicroService {
         List<Future<Boolean>> futures = new LinkedList<>();
         for (Attack tempAt : attacks){
             AttackEvent attackEvent = new AttackEvent(tempAt.getDuration(),tempAt.getSerials());
-            attackEvent.setID(eventID);
             futures.add(sendEvent(attackEvent)); // if leia receives a copy of Future class, how does shhe knows it's updated????????????/
-            eventID++;
         }
         while(!futures.isEmpty()){
             for(Future future : futures){

@@ -1,18 +1,9 @@
 package bgu.spl.mics;
 
-import bgu.spl.mics.application.cEvent;
-import bgu.spl.mics.application.messages.AttackEvent;
-import bgu.spl.mics.application.passiveObjects.Attack;
-import bgu.spl.mics.application.services.LeiaMicroservice;
-
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.SynchronousQueue;
 
 /**
  * The {@link MessageBusImpl class is the implementation of the MessageBus interface.
@@ -28,10 +19,10 @@ public class MessageBusImpl implements MessageBus {
 	//private Map<Message, Map<MicroService, BlockingQueue<Message>>> managerMap;
 	private Map<Class<? extends Message>, BlockingQueue<MicroService>> managerMap;
 	private Map<MicroService, BlockingQueue<Message>> queueManager;
-	private Map<Integer,Future> futureMap;
+	private Map<Message,Future> futureMap;
 	private  Object managerMapLock;
 	private  Object queueManagerLock;
-	//private  Object managerMapLock;
+	private  Object futureMapLock;
 
 	//blocking queue for every Microservice
 	// keyToSendEvent which is managed by subscribe event
@@ -41,6 +32,9 @@ public class MessageBusImpl implements MessageBus {
 		managerMap = new HashMap<>();
 		queueManager = new HashMap<>();
 		futureMap = new HashMap<>();
+		futureMapLock = new Object();
+		queueManagerLock = new Object();
+		managerMapLock = new Object();
 	}
 
 	public static MessageBusImpl getInstance() {
@@ -50,49 +44,80 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
-		if (!managerMap.containsKey(type)) {
-			BlockingQueue<MicroService> toAdd = new LinkedBlockingQueue<>();
-			toAdd.add(m);
-			managerMap.put(type, toAdd);
+		synchronized (managerMapLock) {
+			if (!managerMap.containsKey(type)) {
+				BlockingQueue<MicroService> toAdd = new LinkedBlockingQueue<>();
+				managerMap.put(type, toAdd);
+			}
+			managerMap.get(type).add(m);
+			BlockingQueue<Message> msgToAdd = new LinkedBlockingQueue<>();
+			queueManager.put(m, msgToAdd);
+			notifyAll();
 		}
-		managerMap.get(type).add(m);
 	}
 
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
-		if (!managerMap.containsKey(type)) {
-			BlockingQueue<MicroService> toAdd = new LinkedBlockingQueue<>();
-			toAdd.add(m);
-			managerMap.put(type, toAdd);
+		synchronized (managerMapLock) {
+			if (!managerMap.containsKey(type)) {
+				BlockingQueue<MicroService> toAdd = new LinkedBlockingQueue<>();
+				managerMap.put(type, toAdd);
+			}
+			managerMap.get(type).add(m);
+			BlockingQueue<Message> msgToAdd = new LinkedBlockingQueue<>();
+			queueManager.put(m, msgToAdd);
+			notifyAll();
 		}
-
-		managerMap.get(type).add(m);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> void complete(Event<T> e, T result) {
+		futureMap.get(e).resolve(result);
+		futureMap.remove(e);
 	}
 
 	@Override
 	public void sendBroadcast(Broadcast b) {
-		for (MicroService tempM : managerMap.get(b)) {
-			queueManager.get(tempM).add(b);
+		synchronized (managerMapLock) {
+			while (!managerMap.containsKey(b)) {
+				try {
+					Thread.currentThread().wait();
+				} catch (InterruptedException exc) {
+				}
+			}
+
+			for (MicroService tempM : managerMap.get(b)) {
+				queueManager.get(tempM).add(b);
+			}
 		}
 	}
 
 
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
-		try { // do we need try here????????????????????????????????????????????????
-			MicroService tempM = managerMap.get(e).take();
-			queueManager.get(tempM).add(e);
-			managerMap.get(e).add(tempM);
-			return null; // return future object that is connected to e specified event
-		} catch (Exception exc) { // changed instead of InterruptedException
-			return null;
+		synchronized (managerMapLock) {
+			while (!managerMap.containsKey(e)) {
+				try {
+					Thread.currentThread().wait();
+				} catch (InterruptedException exception) {
+				}
+
+				try {
+					MicroService tempM = managerMap.get(e).take(); //part 1 of round robin method
+					queueManager.get(tempM).add(e);
+					managerMap.get(e).add(tempM); //part 2 of round robin method
+					Future<T> future = new Future<>();
+					futureMap.put(e, future);
+					return future; // return future object that is connected to e specified event
+				} catch (Exception exc) { // changed instead of InterruptedException
+					return null;
+				}
+			}
 		}
+		return null;
 	}
+
 
 	@Override
 	public void register(MicroService m) {
