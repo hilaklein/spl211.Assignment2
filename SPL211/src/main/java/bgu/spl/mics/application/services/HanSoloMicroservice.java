@@ -34,13 +34,13 @@ public class HanSoloMicroservice extends MicroService {
                 List<Integer> ewokList = attackEvent.getEwoksId();
                 Ewok[] tempEw = Input.getInstance().getEwoks().getEwoksArr();
                 for (Integer tempId : ewokList){
-                    tempEw[tempId].acquire();
+                    tempEw[tempId-1].acquire();
                 }
                 try {
                     Thread.currentThread().sleep(attackEvent.getDuration().longValue());
                 }catch (InterruptedException e) {}
                 for (Integer tempId : ewokList){
-                    tempEw[tempId].release();
+                    tempEw[tempId-1].release();
                 }
                 complete(attackEvent, true);
                 Diary diary = Diary.getInstance();
