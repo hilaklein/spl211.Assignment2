@@ -33,6 +33,13 @@ public class Main {
 		Thread tHanSolo = new Thread(new HanSoloMicroservice());
 		Thread tC3po = new Thread(new C3POMicroservice());
 
+		tLeia.setName("tLeia");
+		tR2d2.setName("tR2d2");
+		tLando.setName("tLando");
+		tHanSolo.setName("tHanSolo");
+		tC3po.setName("tC3po");
+
+
 		tHanSolo.start();
 		tC3po.start();
 		tLeia.start();
