@@ -1,5 +1,6 @@
 package bgu.spl.mics;
 
+import bgu.spl.mics.application.cEvent;
 import bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.passiveObjects.Attack;
 import bgu.spl.mics.application.services.LeiaMicroservice;
@@ -25,7 +26,7 @@ public class MessageBusImpl implements MessageBus {
 	}
 
 	//private Map<Message, Map<MicroService, BlockingQueue<Message>>> managerMap;
-	private Map<Message, BlockingQueue<MicroService>> managerMap;
+	private Map<Class<? extends Message>, BlockingQueue<MicroService>> managerMap;
 	private Map<MicroService, BlockingQueue<Message>> queueManager;
 	private Map<Integer,Future> futureMap;
 	private  Object managerMapLock;
@@ -50,14 +51,21 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
 		if (!managerMap.containsKey(type)) {
-			LinkedBlockingQueue<MicroService>()
-			managerMap.put(type,
+			BlockingQueue<MicroService> toAdd = new LinkedBlockingQueue<>();
+			toAdd.add(m);
+			managerMap.put(type, toAdd);
 		}
 		managerMap.get(type).add(m);
 	}
 
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
+		if (!managerMap.containsKey(type)) {
+			BlockingQueue<MicroService> toAdd = new LinkedBlockingQueue<>();
+			toAdd.add(m);
+			managerMap.put(type, toAdd);
+		}
+
 		managerMap.get(type).add(m);
 	}
 
@@ -76,16 +84,15 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
-
-			try {
-				MicroService tempM = managerMap.get(e).take();
-				queueManager.get(tempM).add(e);
-				managerMap.get(e).add(tempM);
-				return null; // return future object that is connected to e specified event
-			} catch (InterruptedException exc) {
-				return null;
-			}
+		try { // do we need try here????????????????????????????????????????????????
+			MicroService tempM = managerMap.get(e).take();
+			queueManager.get(tempM).add(e);
+			managerMap.get(e).add(tempM);
+			return null; // return future object that is connected to e specified event
+		} catch (Exception exc) { // changed instead of InterruptedException
+			return null;
 		}
+	}
 
 	@Override
 	public void register(MicroService m) {
@@ -96,7 +103,7 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public void unregister(MicroService m) {
 		queueManager.remove(m);
-		for (Message msg : managerMap.keySet()) {
+		for (Class<? extends Message> msg : managerMap.keySet()) {
 			managerMap.get(msg).remove(m);
 		}
 	}

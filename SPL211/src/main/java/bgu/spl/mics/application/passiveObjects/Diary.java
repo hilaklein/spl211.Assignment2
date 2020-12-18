@@ -11,23 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Diary {
 
-    /*
-    ●int totalAttacks - the total number of attacks executed by HanSolo and C3PO.can also be of AtomicInteger type. Stamped only by HanSolo or C3PO ​(!!)​.
-    ●long HanSoloFinish - a timestamp indicating when HanSolo finished theexecution of all his attacks.
-    ●long C3POFinish - a timestamp indicating when C3PO finished the execution ofall his attacks.
-    ●long R2D2Deactivate - a timestamp indicating when R2D2 finished deactivationthe shield generator.
-    ●long LeiaTerminate - a time stamp that Leia puts in right before termination.
-    ●long HanSoloTerminate - a time stamp that HanSolo puts in right beforetermination.
-    ●long C3POTerminate - a time stamp that C3PO puts in right before termination.
-    ●long R2D2Terminate - a time stamp that R2d2 puts in right before termination.
-    ●long LandoTerminate - a time stamp that Lando puts in right before termination.
-    ●To get those timestamps, simply use System.currentTimeMillis().
-    ●We will check that your timestamps make sense.
-    ●Each timestamp is recorded by the specified name, e.g. only C3PO is allowed toset the value of C3POFinish. The totalAttacks member is recorded​
-    only byHanSolo or C3PO​.
-    ●You can add to this class members and methods as you see right
-     */
-
     private static class SingletonHolder{
         private static Diary instance = new Diary();
     }
@@ -83,4 +66,42 @@ public class Diary {
     public void setLandoTerminate(long landoTerminate) {
         LandoTerminate = landoTerminate;
     }
+
+
+    public AtomicInteger getTotalAttacks() {
+        return totalAttacks;
+    }
+
+    public long getHanSoloFinish() {
+        return HanSoloFinish;
+    }
+
+    public long getC3POFinish() {
+        return C3POFinish;
+    }
+
+    public long getR2D2Deactivate() {
+        return R2D2Deactivate;
+    }
+
+    public long getLeiaTerminate() {
+        return LeiaTerminate;
+    }
+
+    public long getHanSoloTerminate() {
+        return HanSoloTerminate;
+    }
+
+    public long getC3POTerminate() {
+        return C3POTerminate;
+    }
+
+    public long getR2D2Terminate() {
+        return R2D2Terminate;
+    }
+
+    public long getLandoTerminate() {
+        return LandoTerminate;
+    }
+
 }
