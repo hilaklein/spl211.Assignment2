@@ -1,10 +1,9 @@
 package bgu.spl.mics.application.services;
-
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import bgu.spl.mics.*;
+import bgu.spl.mics.application.messages.BombDestroyerEvent;
 import bgu.spl.mics.application.messages.DeactivationEvent;
 import bgu.spl.mics.application.messages.TerminationBroadcast;
 import bgu.spl.mics.application.passiveObjects.Attack;
@@ -37,10 +36,10 @@ public class LeiaMicroservice extends MicroService {
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
-//        try {
-//            Thread.currentThread().sleep(1000);
-//        }
-//        catch (InterruptedException exception){}
+        try {
+           Thread.currentThread().sleep(1000);
+        }
+       catch (InterruptedException exception){}
         List<Future<Boolean>> futures = new LinkedList<>();
         for (Attack tempAt : attacks){
             AttackEvent attackEvent = new AttackEvent(tempAt.getDuration(),tempAt.getSerials());
@@ -55,7 +54,13 @@ public class LeiaMicroservice extends MicroService {
         }
         System.out.println("Leia: line 57");
         DeactivationEvent deactivationEvent = new DeactivationEvent();
-    	sendEvent(deactivationEvent);
+    	Future<Boolean> deactFuture = sendEvent(deactivationEvent);
+    	if(deactFuture.get()) {
+            Future<Boolean> bombFuture = sendEvent(new BombDestroyerEvent());
+            if(bombFuture.get()){
+                sendBroadcast(new TerminationBroadcast<>());
+            }
+        }
     }
 
     @Override
