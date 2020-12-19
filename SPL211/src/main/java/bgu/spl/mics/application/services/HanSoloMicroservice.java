@@ -42,10 +42,10 @@ public class HanSoloMicroservice extends MicroService {
                 for (Integer tempId : ewokList){
                     tempEw[tempId-1].release();
                 }
-                complete(attackEvent, true);
                 Diary diary = Diary.getInstance();
                 diary.setHanSoloFinish(System.currentTimeMillis());
                 diary.incrementTotalAttacks();
+                complete(attackEvent, true);
             }
         };
         subscribeEvent(AttackEvent.class, callAttack);

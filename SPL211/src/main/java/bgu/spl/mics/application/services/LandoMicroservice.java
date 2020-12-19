@@ -27,12 +27,12 @@ public class LandoMicroservice  extends MicroService {
         Callback<BombDestroyerEvent> bombEvent = new Callback<BombDestroyerEvent>() {
             @Override
             public void call(BombDestroyerEvent c) {
-                System.out.println("bomb event start");
+                //System.out.println("bomb event start");
                 try {
                     Thread.currentThread().sleep(duration);
                 } catch (InterruptedException e) { }
                 complete(c, true);
-                System.out.println("termination sent");
+                //System.out.println("termination sent");
             }
         };
         subscribeEvent(BombDestroyerEvent.class, bombEvent);

@@ -1,5 +1,6 @@
 package bgu.spl.mics.application;
 
+import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.application.passiveObjects.Attack;
 import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.Ewoks;
@@ -23,6 +24,16 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		//args[0] - path to input
 		//args[1] - path and name to output
+		System.out.println(	"start!!!!!!!!!!!!!!!!!!!!!!!!!!11");
+		//MessageBusImpl tempMsgBus = MessageBusImpl.getInstance();
+		//Diary tempDiary = Diary.getInstance();
+		//Input tempInput = Input.getInstance();
+		// In Tester: runTestFromFile : for_loop -> set '20' instead of currentTest.Length so it wont be too long!!!!!!!!!!!!!!!
+		if (args == null){
+			args = new String[2];
+			args[0] = "SPL211/input.json";
+			args[1] = "SPL211/Output.json";
+		}
 		Input input = Input.getInstance();
 		init(args[0], input);
 		LeiaMicroservice leia = new LeiaMicroservice(input.getAttacks());
@@ -40,20 +51,22 @@ public class Main {
 		tR2d2.start();
 		tLando.start();
 
-		try {
-
-			tHanSolo.join();
-			tC3po.join();
-			tLeia.join();
-			tR2d2.join();
-			tLando.join();
-		} catch (InterruptedException e) {}
+//		try {
+//			tHanSolo.join();
+//			tC3po.join();
+//			tLeia.join();
+//			tR2d2.join();
+//			tLando.join();
+//		} catch (InterruptedException e) {
+//			System.out.println("main : try to join(): " + e.getMessage());
+//		}
 
 		createOutput(args[1]);
-		System.out.println(	"end!!!!!!!!!!!!!!!!!!!!!!!!!!11");
+		System.out.println("ewok list: " + Arrays.toString(input.getEwoks().getEwoksArr()));
+		System.out.println("ewok list: " + Arrays.toString(input.getEwoks().getEwoksArr()));
+		System.out.println(	"end!!!!!!!!!!!!!!!!!!!!!!!!!!22 total num of attacks: " + Diary.getInstance().getTotalAttacks());
 		//System.exit(0);
 		//sysytem doesnt stop here...why??????????????????????????????
-
 	}
 
 	public static void createOutput(String pathToSave) throws IOException{
@@ -69,6 +82,7 @@ public class Main {
 				"R2D2Terminate: " + tempD.getR2D2Terminate(),
 				"LandoTerminate: " + tempD.getLandoTerminate());
 		FileWriter fileWriter = new FileWriter(pathToSave);
+		fileWriter.toString();
 		gson.toJson(output, fileWriter);
 		fileWriter.close();
 	}

@@ -131,7 +131,7 @@ public abstract class MicroService implements Runnable {
      *               {@code e}.
      */
     protected final <T> void complete(Event<T> e, T result) {
-        System.out.println("complete(): " + this.name);
+        //System.out.println("complete(): " + this.name);
         messageBus.complete(e, result);
     }
 
@@ -147,6 +147,7 @@ public abstract class MicroService implements Runnable {
      */
     protected final void terminate() {
         flag = false;
+        messageBus.unregister(this);
     }
 
     /**
@@ -170,14 +171,12 @@ public abstract class MicroService implements Runnable {
         this.initialize();
         while (flag){
             try {
-                System.out.println("awaitMessage enterd: " + this.name);
+                //System.out.println("awaitMessage entered at: " + this.name);
                 Message currMsg = messageBus.awaitMessage(this);
                 demandedCallback.get(currMsg.getClass()).call(currMsg);
-                System.out.println("awaitMessage executed: " + this.name);
+                //System.out.println("awaitMessage executed at: " + this.name);
             }catch (InterruptedException e) {}
         }
-
-
     }
 
 }

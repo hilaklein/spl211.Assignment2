@@ -28,4 +28,11 @@ public class Ewok {
     public void release() {
     	
     }
+
+    @Override
+    public String toString() {
+        return "Ewok{" +
+                + serialNumber +
+                '}';
+    }
 }

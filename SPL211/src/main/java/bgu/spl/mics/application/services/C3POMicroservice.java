@@ -45,10 +45,10 @@ public class C3POMicroservice extends MicroService {
                 for (Integer tempId : ewokList){
                     tempEw[tempId-1].release();
                 }
-                complete(attackEvent, true);
                 Diary diary = Diary.getInstance();
                 diary.setC3POFinish(System.currentTimeMillis());
                 diary.incrementTotalAttacks();
+                complete(attackEvent, true);
             }
         };
         subscribeEvent(AttackEvent.class, callAttack);

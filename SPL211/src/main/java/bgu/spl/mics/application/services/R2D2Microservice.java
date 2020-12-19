@@ -29,7 +29,7 @@ public class R2D2Microservice extends MicroService {
         Callback<DeactivationEvent> deactEvent = new Callback<DeactivationEvent>() {
             @Override
             public void call(DeactivationEvent c) {
-                System.out.println("deact event started");
+                //System.out.println("deact event started");
                 try {
                     Thread.currentThread().sleep(duration);
                 } catch (InterruptedException e) { }

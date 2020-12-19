@@ -1,4 +1,5 @@
 package bgu.spl.mics.application.services;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,14 +46,22 @@ public class LeiaMicroservice extends MicroService {
             AttackEvent attackEvent = new AttackEvent(tempAt.getDuration(),tempAt.getSerials());
             futures.add(sendEvent(attackEvent));
         }
-        while(!futures.isEmpty()){
-            for(Future future : futures){
-                if(future.isDone())
-                    futures.remove(future);
-            }
 
+        Iterator<? extends Future> iter = futures.iterator(); //iterator instead of the following foreach commentedOut loop
+        while (iter.hasNext()) {
+            Future ftr = iter.next();
+            if (ftr.isDone())
+                iter.remove();
         }
-        System.out.println("Leia: line 57");
+
+//        while(!futures.isEmpty()){
+//            for(Future future : futures){
+//                if(future.isDone())
+//                    futures.remove(future);
+//            }
+//
+//        }
+        //System.out.println("Leia: line 57");
         DeactivationEvent deactivationEvent = new DeactivationEvent();
     	Future<Boolean> deactFuture = sendEvent(deactivationEvent);
     	if(deactFuture.get()) {
