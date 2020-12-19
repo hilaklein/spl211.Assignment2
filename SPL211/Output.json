@@ -1,11 +1,11 @@
 [
-  "totalAttacks: 0",
-  "HanSoloFinish: 1608389358950",
-  "C3POFinish: 1608389358887",
-  "R2D2Deactivate: 1608389358741",
-  "LeiaTerminate: 1608389358922",
-  "HanSoloTerminate: 1608389358950",
-  "C3POTerminate: 1608389358887",
-  "R2D2Terminate: 1608389358741",
-  "LandoTerminate: 1608389358556"
+  "totalAttacks: 4",
+  "HanSoloFinish: 1608408244387",
+  "C3POFinish: 0",
+  "R2D2Deactivate: 1608408243867",
+  "LeiaTerminate: 1608408244042",
+  "HanSoloTerminate: 1608408244358",
+  "C3POTerminate: 1608408244387",
+  "R2D2Terminate: 1608408244042",
+  "LandoTerminate: 1608408244042"
 ]

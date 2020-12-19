@@ -32,15 +32,21 @@ public class LeiaMicroservice extends MicroService {
         Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
             @Override
             public void call(TerminationBroadcast c) {
-                WriteToDiary();
-                terminate();
+//                Thread writeIt = new Thread(() -> {
+                    WriteToDiary();
+                    terminate();
+//                });
+//                writeIt.start();
+//                try { writeIt.join();} catch (InterruptedException e) {}
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
+
         try {
            Thread.currentThread().sleep(1000);
         }
        catch (InterruptedException exception){}
+
         List<Future<Boolean>> futures = new LinkedList<>();
         for (Attack tempAt : attacks){
             AttackEvent attackEvent = new AttackEvent(tempAt.getDuration(),tempAt.getSerials());
@@ -54,14 +60,7 @@ public class LeiaMicroservice extends MicroService {
                 iter.remove();
         }
 
-//        while(!futures.isEmpty()){
-//            for(Future future : futures){
-//                if(future.isDone())
-//                    futures.remove(future);
-//            }
-//
-//        }
-        //System.out.println("Leia: line 57");
+
         DeactivationEvent deactivationEvent = new DeactivationEvent();
     	Future<Boolean> deactFuture = sendEvent(deactivationEvent);
     	if(deactFuture.get()) {

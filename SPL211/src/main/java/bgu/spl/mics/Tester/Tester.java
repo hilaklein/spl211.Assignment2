@@ -119,7 +119,6 @@ public class Tester {
                 Main.main(null);
                 do {
                     Thread.sleep(10);
-                    System.out.println( "Tester : runTestsFromFile : while_stupid_loop ");
                 } while (!outputFile.exists());
                 System.out.println("\r\n\r\nFinished Test --- > " + i);
                 AtomicInteger numOfAttacksInTest = diaryInstance.getTotalAttacks();

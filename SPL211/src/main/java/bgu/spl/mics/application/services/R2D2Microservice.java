@@ -45,8 +45,12 @@ public class R2D2Microservice extends MicroService {
         Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
             @Override
             public void call(TerminationBroadcast c) {
+//                Thread writeIt = new Thread(() -> {
                 WriteToDiary();
                 terminate();
+//                });
+//                writeIt.start();
+//                try { writeIt.join();} catch (InterruptedException e) {}
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);

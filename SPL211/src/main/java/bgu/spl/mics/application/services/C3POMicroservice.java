@@ -36,29 +36,42 @@ public class C3POMicroservice extends MicroService {
             public void call(AttackEvent attackEvent) {
                 List<Integer> ewokList = attackEvent.getEwoksId();
                 Ewok[] tempEw = Input.getInstance().getEwoks().getEwoksArr();
+
                 for (Integer tempId : ewokList){
                     tempEw[tempId-1].acquire();
                 }
+
                 try {
                     Thread.currentThread().sleep(attackEvent.getDuration().longValue());
                 }catch (InterruptedException e) {}
+
                 for (Integer tempId : ewokList){
                     tempEw[tempId-1].release();
                 }
-                Diary diary = Diary.getInstance();
-                diary.setC3POFinish(System.currentTimeMillis());
-                diary.incrementTotalAttacks();
-                complete(attackEvent, true);
+
+                Thread writeToDiary = new Thread(() -> {
+                    Diary diary = Diary.getInstance();
+                    diary.setHanSoloFinish(System.currentTimeMillis());
+                    diary.incrementTotalAttacks();
+                    complete(attackEvent, true);
+                });
+                writeToDiary.start();
+                try{ writeToDiary.join();} catch (InterruptedException e) {}
             }
         };
+
         subscribeEvent(AttackEvent.class, callAttack);
 
 
         Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
             @Override
             public void call(TerminationBroadcast c) {
+//                Thread writeIt = new Thread(() -> {
                 WriteToDiary();
                 terminate();
+//                });
+//                writeIt.start();
+//                try { writeIt.join();} catch (InterruptedException e) {}
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);

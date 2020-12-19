@@ -22,20 +22,28 @@ import java.util.Map;
 public class Main {
 
 	public static void main(String[] args) throws IOException {
+//		try {
+//			Thread.currentThread().join();
+//		}catch (Exception exp){
+//			System.out.println("main() join() exception: " + exp.getMessage());
+//		}
 		//args[0] - path to input
 		//args[1] - path and name to output
-		System.out.println(	"start!!!!!!!!!!!!!!!!!!!!!!!!!!11");
+		System.out.println("start!!!!!!!!!!!!!!!!!!!!!!!!!!11");
 		//MessageBusImpl tempMsgBus = MessageBusImpl.getInstance();
 		//Diary tempDiary = Diary.getInstance();
 		//Input tempInput = Input.getInstance();
 		// In Tester: runTestFromFile : for_loop -> set '20' instead of currentTest.Length so it wont be too long!!!!!!!!!!!!!!!
-		if (args == null){
+		if (args == null) {
 			args = new String[2];
 			args[0] = "SPL211/input.json";
 			args[1] = "SPL211/Output.json";
 		}
 		Input input = Input.getInstance();
 		init(args[0], input);
+
+		System.out.println("ewok list: " + Arrays.toString(input.getEwoks().getEwoksArr()));
+
 		LeiaMicroservice leia = new LeiaMicroservice(input.getAttacks());
 
 		Thread tLeia = new Thread(leia);
@@ -44,29 +52,25 @@ public class Main {
 		Thread tHanSolo = new Thread(new HanSoloMicroservice());
 		Thread tC3po = new Thread(new C3POMicroservice());
 
-
 		tHanSolo.start();
 		tC3po.start();
 		tLeia.start();
 		tR2d2.start();
 		tLando.start();
 
-//		try {
-//			tHanSolo.join();
-//			tC3po.join();
-//			tLeia.join();
-//			tR2d2.join();
-//			tLando.join();
-//		} catch (InterruptedException e) {
-//			System.out.println("main : try to join(): " + e.getMessage());
-//		}
+		try {
+			tC3po.join();
+			tHanSolo.join();
+			tLeia.join();
+			tR2d2.join();
+			tLando.join();
+		} catch (InterruptedException e) {
+			System.out.println("main : try to join(): " + e.getMessage());
+		}
+
 
 		createOutput(args[1]);
-		System.out.println("ewok list: " + Arrays.toString(input.getEwoks().getEwoksArr()));
-		System.out.println("ewok list: " + Arrays.toString(input.getEwoks().getEwoksArr()));
-		System.out.println(	"end!!!!!!!!!!!!!!!!!!!!!!!!!!22 total num of attacks: " + Diary.getInstance().getTotalAttacks());
-		//System.exit(0);
-		//sysytem doesnt stop here...why??????????????????????????????
+		System.out.println("end!!!!!!!!!!!!!!!!!!!!!!!!!!22 total num of attacks: " + Diary.getInstance().getTotalAttacks());
 	}
 
 	public static void createOutput(String pathToSave) throws IOException{
@@ -82,8 +86,8 @@ public class Main {
 				"R2D2Terminate: " + tempD.getR2D2Terminate(),
 				"LandoTerminate: " + tempD.getLandoTerminate());
 		FileWriter fileWriter = new FileWriter(pathToSave);
-		fileWriter.toString();
 		gson.toJson(output, fileWriter);
+		fileWriter.flush();
 		fileWriter.close();
 	}
 
