@@ -69,6 +69,9 @@ public class Main {
 		}
 
 
+//		for (Attack a : input.getAttacks()){
+//			System.out.print(a.getDuration()+"; ");
+//		}
 		createOutput(args[1]);
 		//System.out.println("end!!!!!!!!!!!!!!!!!!!!!!!!!!22 total num of attacks: " + Diary.getInstance().getTotalAttacks());
 	}

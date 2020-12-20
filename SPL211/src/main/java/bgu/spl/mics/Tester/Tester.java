@@ -110,7 +110,7 @@ public class Tester {
         Diary diaryInstance = Diary.getInstance();
         try {
             currentTests = getTestsFromJson("SPL211/Tests.json");
-            for (int i = 0; i < 30; i++) { // set '20' instead of currentTest.Length so it wont be too long!!!!!!!!!!!!!!!
+            for (int i = 0; i < currentTests.length; i++) { // set '20' instead of currentTest.Length so it wont be too long!!!!!!!!!!!!!!!
                 //System.out.println( "Tester : runTestsFromFile : for_loop");
                 saveOutputToJson("SPL211/input.json", currentTests[i]);
                 //An output file shall be only created whenever the program finishes it's logic.
