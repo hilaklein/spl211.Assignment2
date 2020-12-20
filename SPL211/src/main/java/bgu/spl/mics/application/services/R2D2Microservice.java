@@ -26,16 +26,17 @@ public class R2D2Microservice extends MicroService {
 
     @Override
     protected void initialize() {
+        //System.out.println("r2d2 start init");
         Callback<DeactivationEvent> deactEvent = new Callback<DeactivationEvent>() {
             @Override
             public void call(DeactivationEvent c) {
-                //System.out.println("deact event started");
+
                 try {
                     Thread.currentThread().sleep(duration);
-                } catch (InterruptedException e) { }
+                } catch (InterruptedException e) {
+                }
+
                 complete(c, true);
-//                BombDestroyerEvent bombDestroyerEvent = new BombDestroyerEvent();
-//                sendEvent(bombDestroyerEvent);
                 Diary diary = Diary.getInstance();
                 diary.setR2D2Deactivate(System.currentTimeMillis());
             }
@@ -54,6 +55,7 @@ public class R2D2Microservice extends MicroService {
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
+        //System.out.println("r2d2 stop init");
     }
 
     @Override

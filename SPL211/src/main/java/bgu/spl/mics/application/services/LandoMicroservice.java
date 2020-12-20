@@ -23,7 +23,7 @@ public class LandoMicroservice  extends MicroService {
 
     @Override
     protected void initialize() {
-
+        //System.out.println( "lando start init");
         Callback<BombDestroyerEvent> bombEvent = new Callback<BombDestroyerEvent>() {
             @Override
             public void call(BombDestroyerEvent c) {
@@ -49,6 +49,8 @@ public class LandoMicroservice  extends MicroService {
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
+        //System.out.println( "lando stop init");
+
     }
 
     @Override

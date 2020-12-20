@@ -29,7 +29,7 @@ public class Main {
 //		}
 		//args[0] - path to input
 		//args[1] - path and name to output
-		System.out.println("start!!!!!!!!!!!!!!!!!!!!!!!!!!11");
+		//System.out.println("start!!!!!!!!!!!!!!!!!!!!!!!!!!11");
 		//MessageBusImpl tempMsgBus = MessageBusImpl.getInstance();
 		//Diary tempDiary = Diary.getInstance();
 		//Input tempInput = Input.getInstance();
@@ -42,7 +42,7 @@ public class Main {
 		Input input = Input.getInstance();
 		init(args[0], input);
 
-		System.out.println("ewok list: " + Arrays.toString(input.getEwoks().getEwoksArr()));
+		//System.out.println("ewok list: " + Arrays.toString(input.getEwoks().getEwoksArr()));
 
 		LeiaMicroservice leia = new LeiaMicroservice(input.getAttacks());
 
@@ -59,18 +59,18 @@ public class Main {
 		tLando.start();
 
 		try {
-			tC3po.join();
-			tHanSolo.join();
+//			tC3po.join();
+//			tHanSolo.join();
 			tLeia.join();
-			tR2d2.join();
-			tLando.join();
+//			tR2d2.join();
+//			tLando.join();
 		} catch (InterruptedException e) {
 			System.out.println("main : try to join(): " + e.getMessage());
 		}
 
 
 		createOutput(args[1]);
-		System.out.println("end!!!!!!!!!!!!!!!!!!!!!!!!!!22 total num of attacks: " + Diary.getInstance().getTotalAttacks());
+		//System.out.println("end!!!!!!!!!!!!!!!!!!!!!!!!!!22 total num of attacks: " + Diary.getInstance().getTotalAttacks());
 	}
 
 	public static void createOutput(String pathToSave) throws IOException{

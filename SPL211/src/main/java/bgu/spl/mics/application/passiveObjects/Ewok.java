@@ -14,19 +14,23 @@ public class Ewok {
 	    this.serialNumber = serialNum;
 	    available = true;
     }
-  
+
+    public boolean isAvailable() {
+        return available;
+    }
+
     /**
      * Acquires an Ewok
      */
     public void acquire() {
-		
+		available = false;
     }
 
     /**
      * release an Ewok
      */
     public void release() {
-    	
+    	available = true;
     }
 
     @Override

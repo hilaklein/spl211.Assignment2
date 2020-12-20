@@ -21,7 +21,6 @@ public class MessageBusImpl implements MessageBus {
 	private Map<MicroService, BlockingQueue<Message>> queueManager;
 	private Map<Message, Future> futureMap;
 	private Object managerMapLock;
-	//private Object queueEventLock;
 
 
 	private MessageBusImpl() {
@@ -29,8 +28,8 @@ public class MessageBusImpl implements MessageBus {
 		queueManager = new HashMap<>();
 		futureMap = new HashMap<>();
 		managerMapLock = new Object();
-//		queueEventLock = new Object();
 	}
+
 
 	public static MessageBusImpl getInstance() {
 		return SingletonHOlder.instance;
@@ -48,13 +47,8 @@ public class MessageBusImpl implements MessageBus {
 			managerMap.get(type).add(m);
 			managerMapLock.notifyAll();
 		}
-		//synchronized (queueEventLock) {
-		//BlockingQueue<Message> msgToAdd = new LinkedBlockingQueue<>();
-		//queueManager.put(m, msgToAdd);
-		//queueEventLock.notifyAll();
-		//}
 	}
-	//}
+
 
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
@@ -64,23 +58,26 @@ public class MessageBusImpl implements MessageBus {
 				managerMap.put(type, toAdd);
 				//managerMapLock.notifyAll();
 			}
-			managerMap.get(type).add(m);
-			BlockingQueue<Message> msgToAdd = new LinkedBlockingQueue<>();
-			queueManager.put(m, msgToAdd);
-			managerMapLock.notifyAll();
+			try {
+				managerMap.get(type).add(m);
+				BlockingQueue<Message> msgToAdd = new LinkedBlockingQueue<>();
+				queueManager.put(m, msgToAdd);
+				managerMapLock.notifyAll();
+			} catch (Exception e) {}
 		}
-		//synchronized (queueEventLock) {
-
-		//queueEventLock.notifyAll();
-		//}
 	}
+
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> void complete(Event<T> e, T result) {
-		futureMap.get(e).resolve(result);
-		futureMap.remove(e);
+		synchronized (managerMapLock) {
+			futureMap.get(e).resolve(result);
+			futureMap.remove(e);
+			managerMapLock.notifyAll();
+		}
 	}
+
 
 	@Override
 	public void sendBroadcast(Broadcast b) {
@@ -97,6 +94,7 @@ public class MessageBusImpl implements MessageBus {
 		}
 	}
 
+
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
 		synchronized (managerMapLock) {
@@ -109,15 +107,18 @@ public class MessageBusImpl implements MessageBus {
 		}
 		if (!managerMap.get(e.getClass()).isEmpty()) { //added cause tempM received null - maybe is not needed after the tests
 			try {
-				MicroService tempM = managerMap.get(e.getClass()).take();
-				queueManager.get(tempM).add(e);
-				managerMap.get(e.getClass()).add(tempM);
-			} catch (InterruptedException exp) {
+				MicroService tempM = managerMap.get(e.getClass()).take(); //part 1 of round robin method
+				BlockingQueue<Message> tempQueue = queueManager.get(tempM);
+				tempQueue.add(e);
+				managerMap.get(e.getClass()).add(tempM); //part 2 of round robin method
+			} catch (Exception exp) {
 			}
 		}
+
 		synchronized (managerMapLock) {
 			managerMapLock.notifyAll();
 		}
+
 		Future<T> future = new Future<>();
 		futureMap.put(e, future);
 		return future;
@@ -128,8 +129,8 @@ public class MessageBusImpl implements MessageBus {
 	public void register(MicroService m) {
 		BlockingQueue<Message> tempBQ = new LinkedBlockingQueue<>();
 		queueManager.put(m, tempBQ);
-		//queueEventLock.notifyAll();
 	}
+
 
 	@Override
 	public void unregister(MicroService m) {
@@ -138,6 +139,7 @@ public class MessageBusImpl implements MessageBus {
 			managerMap.get(msg).remove(m);
 		}
 	}
+
 
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {

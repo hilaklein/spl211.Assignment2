@@ -110,8 +110,8 @@ public class Tester {
         Diary diaryInstance = Diary.getInstance();
         try {
             currentTests = getTestsFromJson("SPL211/Tests.json");
-            for (int i = 0; i < 20; i++) { // set '20' instead of currentTest.Length so it wont be too long!!!!!!!!!!!!!!!
-                System.out.println( "Tester : runTestsFromFile : for_loop");
+            for (int i = 0; i < 30; i++) { // set '20' instead of currentTest.Length so it wont be too long!!!!!!!!!!!!!!!
+                //System.out.println( "Tester : runTestsFromFile : for_loop");
                 saveOutputToJson("SPL211/input.json", currentTests[i]);
                 //An output file shall be only created whenever the program finishes it's logic.
                 File outputFile = new File("SPL211/Output.json");
@@ -137,7 +137,7 @@ public class Tester {
           
                 if (numOfAttacksInTest.get() == (currentTests[i].getNumberOfAttacks().get()))
                     passedSecondTest = true;
-                System.out.println("Nooooooooooooooooooo: attacksDiary: " + numOfAttacksInTest.get() + "----attacksTest: " + currentTests[i].getNumberOfAttacks().get());
+                //System.out.println("Nooooooooooooooooooo: attacksDiary: " + numOfAttacksInTest.get() + "----attacksTest: " + currentTests[i].getNumberOfAttacks().get());
 
                 long soloTerminate = (diaryInstance.getHanSoloTerminate());
                 long C3POTerminate = (diaryInstance.getC3POTerminate());
@@ -159,7 +159,7 @@ public class Tester {
                     System.out.println("Failed Test --> " + i);
                     failedTests++;
                 }
-                System.out.println("=========Num Of Attacks Logic test: " + passedSecondTest + "\n=========Termination Difference test: " + passedThirdTest );
+                //System.out.println("=========Num Of Attacks Logic test: " + passedSecondTest + "\n=========Termination Difference test: " + passedThirdTest );
                 System.out.println("\r\n");
                 diaryInstance.resetNumberAttacks();
             }

@@ -1,1 +1,1 @@
-{"attacks":[{"serials":[1,4,5,6,7,9],"duration":378},{"serials":[1,3,9],"duration":313},{"serials":[2,3,6,8],"duration":236},{"serials":[2,4,5,7,8,9],"duration":297}],"R2D2":116,"Lando":173,"Ewoks":9,"testId":19,"numOfAttacks":4}
+{"attacks":[{"serials":[6,10],"duration":255},{"serials":[6,7,9,10],"duration":256},{"serials":[4,6,9],"duration":322},{"serials":[1,3,5,6,9],"duration":217},{"serials":[1,2,10],"duration":246},{"serials":[3,8],"duration":327},{"serials":[1,5,6,8,9],"duration":376}],"R2D2":125,"Lando":181,"Ewoks":10,"testId":29,"numOfAttacks":7}

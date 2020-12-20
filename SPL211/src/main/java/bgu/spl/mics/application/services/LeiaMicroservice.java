@@ -29,6 +29,7 @@ public class LeiaMicroservice extends MicroService {
 
     @Override
     protected void initialize() {
+        //System.out.println( "leia start init");
         Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
             @Override
             public void call(TerminationBroadcast c) {
@@ -53,11 +54,13 @@ public class LeiaMicroservice extends MicroService {
             futures.add(sendEvent(attackEvent));
         }
 
-        Iterator<? extends Future> iter = futures.iterator(); //iterator instead of the following foreach commentedOut loop
-        while (iter.hasNext()) {
-            Future ftr = iter.next();
-            if (ftr.isDone())
-                iter.remove();
+        while (!futures.isEmpty()){
+            List<Future<Boolean>> tempList = new LinkedList<>(futures);
+            for (Future ftr : tempList){
+                if (ftr.isDone())
+                    futures.remove(ftr);
+
+            }
         }
 
 
@@ -69,6 +72,8 @@ public class LeiaMicroservice extends MicroService {
                 sendBroadcast(new TerminationBroadcast<>());
             }
         }
+        //System.out.println( "leia stop init");
+
     }
 
     @Override

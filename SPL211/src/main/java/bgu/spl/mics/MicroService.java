@@ -166,7 +166,7 @@ public abstract class MicroService implements Runnable {
     public final void run() {
         //1. pull the message from the queue
         //2. call the relevant callback()
-
+        //System.out.println(this.getName() + " -->start run");
         messageBus.register(this);
         this.initialize();
         while (flag){
@@ -175,8 +175,9 @@ public abstract class MicroService implements Runnable {
                 Message currMsg = messageBus.awaitMessage(this);
                 demandedCallback.get(currMsg.getClass()).call(currMsg);
                 //System.out.println("awaitMessage executed at: " + this.name);
-            }catch (InterruptedException e) {}
+            }catch (Exception e) {}
         }
+        //System.out.println(this.getName() + " -->stop run");
     }
 
 }
