@@ -147,7 +147,6 @@ public abstract class MicroService implements Runnable {
      */
     protected final void terminate() {
         flag = false;
-        messageBus.unregister(this);
     }
 
     /**
@@ -177,6 +176,8 @@ public abstract class MicroService implements Runnable {
                 //System.out.println("awaitMessage executed at: " + this.name);
             }catch (Exception e) {}
         }
+        messageBus.unregister(this);
+
         //System.out.println(this.getName() + " -->stop run");
     }
 

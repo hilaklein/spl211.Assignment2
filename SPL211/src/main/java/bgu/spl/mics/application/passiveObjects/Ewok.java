@@ -22,15 +22,21 @@ public class Ewok {
     /**
      * Acquires an Ewok
      */
-    public void acquire() {
-		available = false;
+    public synchronized void acquire() {
+        while (!available) {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {}
+        }
+        available = false;
     }
 
     /**
      * release an Ewok
      */
-    public void release() {
+    public synchronized void release() {
     	available = true;
+    	this.notifyAll();
     }
 
     @Override
