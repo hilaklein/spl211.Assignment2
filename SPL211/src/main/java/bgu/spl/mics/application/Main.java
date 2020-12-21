@@ -59,16 +59,16 @@ public class Main {
 		tLando.start();
 
 		try {
-//			tC3po.join();
-//			tHanSolo.join();
+			tC3po.join();
+			tHanSolo.join();
 			tLeia.join();
-//			tR2d2.join();
-//			tLando.join();
+			tR2d2.join();
+			tLando.join();
 		} catch (InterruptedException e) {
 			System.out.println("main : try to join(): " + e.getMessage());
 		}
 
-
+		//MessageBusImpl.getInstance().unregister(input.getLando());
 //		for (Attack a : input.getAttacks()){
 //			System.out.print(a.getDuration()+"; ");
 //		}

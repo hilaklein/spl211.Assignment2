@@ -21,6 +21,7 @@ public class MessageBusImpl implements MessageBus {
 	private Object managerMapLock;
 	private Object queueMapLock;
 //	private Object futureMapLock;
+	private BlockingQueue<MicroService> registered;
 
 
 
@@ -31,6 +32,7 @@ public class MessageBusImpl implements MessageBus {
 		managerMapLock = new Object();
 		queueMapLock = new Object();
 //		futureMapLock = new Object();
+		registered = new LinkedBlockingQueue<>();
 	}
 
 
@@ -132,6 +134,8 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
+		Future<T> future = new Future<>();
+		futureMap.put(e, future);
 		synchronized (managerMapLock) {
 			while (!managerMap.containsKey(e.getClass())) {
 				try {
@@ -155,8 +159,7 @@ public class MessageBusImpl implements MessageBus {
 			queueMapLock.notifyAll();
 		}
 //		synchronized (futureMapLock) {
-			Future<T> future = new Future<>();
-			futureMap.put(e, future);
+
 //			futureMapLock.notifyAll();
 			return future;
 //		}
@@ -171,6 +174,7 @@ public class MessageBusImpl implements MessageBus {
 			queueManager.put(m, tempBQ);
 			queueMapLock.notifyAll();
 		}
+		registered.add(m);
 	}
 
 
@@ -184,6 +188,12 @@ public class MessageBusImpl implements MessageBus {
 		synchronized (queueMapLock) {
 			queueManager.remove(m);
 //			System.out.println(m.getName() + " unregistered");
+		}
+		registered.remove(m);
+		if(registered.isEmpty()){
+			managerMap.clear();
+			queueManager.clear();
+			futureMap.clear();
 		}
 	}
 

@@ -47,16 +47,12 @@ public class R2D2Microservice extends MicroService {
                     Thread.currentThread().sleep(duration);
                 } catch (InterruptedException e) {
                 }
-
                 complete(c, true);
                 Diary diary = Diary.getInstance();
                 diary.setR2D2Deactivate(System.currentTimeMillis());
             }
         };
         subscribeEvent(DeactivationEvent.class, deactEvent);
-
-
-        //System.out.println("r2d2 stop init");
     }
 
     @Override

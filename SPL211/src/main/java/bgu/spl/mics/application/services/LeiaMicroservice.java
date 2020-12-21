@@ -31,16 +31,11 @@ public class LeiaMicroservice extends MicroService {
 
     @Override
     protected void initialize() {
-        //System.out.println( "leia start init");
         Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
             @Override
             public void call(TerminationBroadcast c) {
-//                Thread writeIt = new Thread(() -> {
                 WriteToDiary();
                 terminate();
-//                });
-//                writeIt.start();
-//                try { writeIt.join();} catch (InterruptedException e) {}
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
@@ -55,24 +50,15 @@ public class LeiaMicroservice extends MicroService {
             AttackEvent attackEvent = new AttackEvent(tempAt.getDuration(), tempAt.getSerials());
             futures.add(sendEvent(attackEvent));
         }
-        System.out.println( "sendEvent happened");
-
         for (Future ftr : futures) {
             ftr.get();
         }
-        System.out.println("futures resolved");
-
         DeactivationEvent deactivationEvent = new DeactivationEvent();
         Future<Boolean> deactFuture = sendEvent(deactivationEvent);
         deactFuture.get();
-        System.out.println( "sendDeactivation happened");
         Future<Boolean> bombFuture = sendEvent(new BombDestroyerEvent());
         bombFuture.get();
         sendBroadcast(new TerminationBroadcast<>());
-        System.out.println( "sendBroadcast happened");
-
-        //System.out.println( "leia stop init");
-
     }
 
     @Override

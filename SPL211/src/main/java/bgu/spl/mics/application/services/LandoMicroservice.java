@@ -45,14 +45,9 @@ public class LandoMicroservice  extends MicroService {
                     Thread.currentThread().sleep(duration);
                 } catch (InterruptedException e) { }
                 complete(c, true);
-                //System.out.println("termination sent");
             }
         };
         subscribeEvent(BombDestroyerEvent.class, bombEvent);
-
-
-        //System.out.println( "lando stop init");
-
     }
 
     @Override
