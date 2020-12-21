@@ -23,28 +23,36 @@ public class LandoMicroservice  extends MicroService {
 
     @Override
     protected void initialize() {
+        Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
+            @Override
+            public void call(TerminationBroadcast c) {
+//                Thread writeIt = new Thread(() -> {
+                WriteToDiary();
+                terminate();
+//                });
+//                writeIt.start();
+//                try { writeIt.join();} catch (InterruptedException e) {}
+            }
+        };
+        subscribeBroadcast(TerminationBroadcast.class, callTerminate);
 
+        //System.out.println( "lando start init");
         Callback<BombDestroyerEvent> bombEvent = new Callback<BombDestroyerEvent>() {
             @Override
             public void call(BombDestroyerEvent c) {
-                System.out.println("bomb event start");
+                //System.out.println("bomb event start");
                 try {
                     Thread.currentThread().sleep(duration);
                 } catch (InterruptedException e) { }
                 complete(c, true);
-                System.out.println("termination sent");
+                //System.out.println("termination sent");
             }
         };
         subscribeEvent(BombDestroyerEvent.class, bombEvent);
 
-        Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
-            @Override
-            public void call(TerminationBroadcast c) {
-                WriteToDiary();
-                terminate();
-            }
-        };
-        subscribeBroadcast(TerminationBroadcast.class, callTerminate);
+
+        //System.out.println( "lando stop init");
+
     }
 
     @Override

@@ -1,6 +1,9 @@
 package bgu.spl.mics.application.services;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.messages.BombDestroyerEvent;
@@ -19,7 +22,7 @@ import bgu.spl.mics.application.passiveObjects.Diary;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class LeiaMicroservice extends MicroService {
-	private Attack[] attacks;
+    private Attack[] attacks;
 
     public LeiaMicroservice(Attack[] attacks) {
         super("Leia");
@@ -28,39 +31,48 @@ public class LeiaMicroservice extends MicroService {
 
     @Override
     protected void initialize() {
+        //System.out.println( "leia start init");
         Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
             @Override
             public void call(TerminationBroadcast c) {
+//                Thread writeIt = new Thread(() -> {
                 WriteToDiary();
                 terminate();
+//                });
+//                writeIt.start();
+//                try { writeIt.join();} catch (InterruptedException e) {}
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
-        try {
-           Thread.currentThread().sleep(1000);
-        }
-       catch (InterruptedException exception){}
-        List<Future<Boolean>> futures = new LinkedList<>();
-        for (Attack tempAt : attacks){
-            AttackEvent attackEvent = new AttackEvent(tempAt.getDuration(),tempAt.getSerials());
+
+//        try {
+//            Thread.currentThread().sleep(500);
+//        } catch (InterruptedException exception) {
+//        }
+
+        BlockingQueue<Future<Boolean>> futures = new LinkedBlockingQueue<>();
+        for (Attack tempAt : attacks) {
+            AttackEvent attackEvent = new AttackEvent(tempAt.getDuration(), tempAt.getSerials());
             futures.add(sendEvent(attackEvent));
         }
-        while(!futures.isEmpty()){
-            for(Future future : futures){
-                if(future.isDone())
-                    futures.remove(future);
-            }
+        System.out.println( "sendEvent happened");
 
+        for (Future ftr : futures) {
+            ftr.get();
         }
-        System.out.println("Leia: line 57");
+        System.out.println("futures resolved");
+
         DeactivationEvent deactivationEvent = new DeactivationEvent();
-    	Future<Boolean> deactFuture = sendEvent(deactivationEvent);
-    	if(deactFuture.get()) {
-            Future<Boolean> bombFuture = sendEvent(new BombDestroyerEvent());
-            if(bombFuture.get()){
-                sendBroadcast(new TerminationBroadcast<>());
-            }
-        }
+        Future<Boolean> deactFuture = sendEvent(deactivationEvent);
+        deactFuture.get();
+        System.out.println( "sendDeactivation happened");
+        Future<Boolean> bombFuture = sendEvent(new BombDestroyerEvent());
+        bombFuture.get();
+        sendBroadcast(new TerminationBroadcast<>());
+        System.out.println( "sendBroadcast happened");
+
+        //System.out.println( "leia stop init");
+
     }
 
     @Override

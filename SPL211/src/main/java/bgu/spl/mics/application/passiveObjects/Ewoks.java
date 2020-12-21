@@ -15,7 +15,7 @@ public class Ewoks {
     public Ewoks(int numOfEwoks){
         ewoks = new Ewok[numOfEwoks];
         for (int i = 0; i < numOfEwoks; i++){
-            ewoks[i] = new Ewok(i);
+            ewoks[i] = new Ewok(i+1);
         }
     }
 

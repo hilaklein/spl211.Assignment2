@@ -26,30 +26,37 @@ public class R2D2Microservice extends MicroService {
 
     @Override
     protected void initialize() {
+        Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
+            @Override
+            public void call(TerminationBroadcast c) {
+//                Thread writeIt = new Thread(() -> {
+                WriteToDiary();
+                terminate();
+//                });
+//                writeIt.start();
+//                try { writeIt.join();} catch (InterruptedException e) {}
+            }
+        };
+        subscribeBroadcast(TerminationBroadcast.class, callTerminate);
+        //System.out.println("r2d2 start init");
         Callback<DeactivationEvent> deactEvent = new Callback<DeactivationEvent>() {
             @Override
             public void call(DeactivationEvent c) {
-                System.out.println("deact event started");
+
                 try {
                     Thread.currentThread().sleep(duration);
-                } catch (InterruptedException e) { }
+                } catch (InterruptedException e) {
+                }
+
                 complete(c, true);
-//                BombDestroyerEvent bombDestroyerEvent = new BombDestroyerEvent();
-//                sendEvent(bombDestroyerEvent);
                 Diary diary = Diary.getInstance();
                 diary.setR2D2Deactivate(System.currentTimeMillis());
             }
         };
         subscribeEvent(DeactivationEvent.class, deactEvent);
 
-        Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
-            @Override
-            public void call(TerminationBroadcast c) {
-                WriteToDiary();
-                terminate();
-            }
-        };
-        subscribeBroadcast(TerminationBroadcast.class, callTerminate);
+
+        //System.out.println("r2d2 stop init");
     }
 
     @Override

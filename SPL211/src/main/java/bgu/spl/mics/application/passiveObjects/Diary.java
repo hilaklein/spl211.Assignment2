@@ -25,6 +25,9 @@ public class Diary {
     private long R2D2Terminate;
     private long LandoTerminate;
 
+    public void resetNumberAttacks(){ //remove after test!!!!!!!!!!!!!!!!!!!!!!!
+        this.totalAttacks.set(0);
+    }
 
 
     public static Diary getInstance(){

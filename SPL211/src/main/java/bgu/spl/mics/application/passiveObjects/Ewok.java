@@ -14,18 +14,35 @@ public class Ewok {
 	    this.serialNumber = serialNum;
 	    available = true;
     }
-  
+
+    public boolean isAvailable() {
+        return available;
+    }
+
     /**
      * Acquires an Ewok
      */
-    public void acquire() {
-		
+    public synchronized void acquire() {
+        while (!available) {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {}
+        }
+        available = false;
     }
 
     /**
      * release an Ewok
      */
-    public void release() {
-    	
+    public synchronized void release() {
+    	available = true;
+    	this.notifyAll();
+    }
+
+    @Override
+    public String toString() {
+        return "Ewok{" +
+                + serialNumber +
+                '}';
     }
 }
