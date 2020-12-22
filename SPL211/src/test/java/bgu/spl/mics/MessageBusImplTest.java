@@ -2,6 +2,7 @@ package bgu.spl.mics;
 
 import bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.messages.testBroadcast;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +17,14 @@ class MessageBusImplTest {
     Broadcast broadcast;
     MicroService microService1;
     MicroService microService2;
+
+    @AfterEach
+    void tearDown() {
+
+        messageBus.unregister(microService1);
+        messageBus.unregister(microService2);
+    }
+
     @BeforeEach
     void setUp() {
         messageBus = MessageBusImpl.getInstance();
@@ -31,6 +40,7 @@ class MessageBusImplTest {
 
             }
         };
+
         microService2 = new MicroService("receiveTest") {
             @Override
             protected void initialize() {
