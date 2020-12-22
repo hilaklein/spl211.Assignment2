@@ -17,8 +17,6 @@ public class LandoMicroservice  extends MicroService {
     public LandoMicroservice(long duration) {
         super("Lando");
         this.duration = duration;
-
-        /* !!!!!!!!Lando can be the class that sends Broadcast message so every other microservices (threads) could terminate themselves!!!!!!!!! */
     }
 
     @Override
@@ -26,22 +24,16 @@ public class LandoMicroservice  extends MicroService {
         Callback<TerminationBroadcast> callTerminate = new Callback<TerminationBroadcast>() {
             @Override
             public void call(TerminationBroadcast c) {
-//                Thread writeIt = new Thread(() -> {
                 WriteToDiary();
                 terminate();
-//                });
-//                writeIt.start();
-//                try { writeIt.join();} catch (InterruptedException e) {}
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
         TerminationBroadcast.terminateCountDown.countDown();
 
-        //System.out.println( "lando start init");
         Callback<BombDestroyerEvent> bombEvent = new Callback<BombDestroyerEvent>() {
             @Override
             public void call(BombDestroyerEvent c) {
-                //System.out.println("bomb event start");
                 try {
                     Thread.currentThread().sleep(duration);
                 } catch (InterruptedException e) { }

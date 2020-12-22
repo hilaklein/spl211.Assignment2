@@ -25,7 +25,6 @@ public class Ewok {
     public synchronized void acquire() {
         while (!available) {
             try {
-                //System.out.println(Thread.currentThread().getName()+"wait in acquire");
                 this.wait();
             } catch (InterruptedException e) {}
         }
