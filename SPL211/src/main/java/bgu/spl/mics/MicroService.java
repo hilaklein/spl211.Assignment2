@@ -1,6 +1,7 @@
 package bgu.spl.mics;
 
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The MicroService is an abstract class that any micro-service in the system
@@ -101,12 +102,6 @@ public abstract class MicroService implements Runnable {
      * 	       			null in case no micro-service has subscribed to {@code e.getClass()}.
      */
     protected final <T> Future<T> sendEvent(Event<T> e) {
-        //check via messageBus if someone is subscribed to this event
-        // if no one is subscribed, this method is going to sleep untill someone is subscribed
-
-        //while (sendEvent == null)
-        // return output
-
     	return messageBus.sendEvent(e);
     }
 
@@ -146,6 +141,7 @@ public abstract class MicroService implements Runnable {
      * message.
      */
     protected final void terminate() {
+        //System.out.println(this.getName() +" terminate");
         flag = false;
     }
 
@@ -157,6 +153,7 @@ public abstract class MicroService implements Runnable {
         return name;
     }
 
+
     /**
      * The entry point of the micro-service. TODO: you must complete this code
      * otherwise you will end up in an infinite loop.
@@ -167,6 +164,7 @@ public abstract class MicroService implements Runnable {
         //2. call the relevant callback()
         //System.out.println(this.getName() + " -->start run");
         messageBus.register(this);
+        //System.out.println(this.getName()+ "has registered");
         this.initialize();
         while (flag){
             try {
@@ -177,6 +175,7 @@ public abstract class MicroService implements Runnable {
             }catch (Exception e) {}
         }
         messageBus.unregister(this);
+        //System.out.println(this.getName()+ " unregistered");
         //System.out.println(this.getName() + " -->stop run");
     }
 

@@ -1,7 +1,10 @@
 package bgu.spl.mics;
 
+import bgu.spl.mics.application.messages.AttackEvent;
+
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -20,8 +23,8 @@ public class MessageBusImpl implements MessageBus {
 	private Map<Message, Future> futureMap;
 	private Object managerMapLock;
 	private Object queueMapLock;
-//	private Object futureMapLock;
-	private BlockingQueue<MicroService> registered;
+	private Object futureMapLock;
+	private int subscribedCounterBrod;
 
 
 
@@ -31,8 +34,8 @@ public class MessageBusImpl implements MessageBus {
 		futureMap = new HashMap<>();
 		managerMapLock = new Object();
 		queueMapLock = new Object();
-//		futureMapLock = new Object();
-		registered = new LinkedBlockingQueue<>();
+		futureMapLock = new Object();
+		subscribedCounterBrod = 0;
 	}
 
 
@@ -50,7 +53,7 @@ public class MessageBusImpl implements MessageBus {
 				//managerMapLock.notifyAll();
 			}
 			managerMap.get(type).add(m);
-			managerMapLock.notifyAll();
+			//managerMapLock.notifyAll();
 		}
 	}
 
@@ -67,102 +70,113 @@ public class MessageBusImpl implements MessageBus {
 				managerMap.get(type).add(m);
 //				BlockingQueue<Message> msgToAdd = new LinkedBlockingQueue<>();
 //				queueManager.put(m, msgToAdd);
-				managerMapLock.notifyAll();
+				//managerMapLock.notifyAll();
 //			} catch (Exception e) {}
 		}
+		subscribedCounterBrod++;
+		//System.out.println(subscribedCounterBrod + "has subscribed");
+
 	}
 
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> void complete(Event<T> e, T result) {
-//		synchronized (futureMapLock) {
-//			while (!futureMap.containsKey(e)){
-//				try {
-//					futureMapLock.wait();
-//				} catch (InterruptedException exc) {}
-//			}
+		synchronized (futureMapLock) {
+			while (!futureMap.containsKey(e)) {
+				try {
+					futureMapLock.wait();
+				} catch (InterruptedException ex) {
+				}
+			}
 			futureMap.get(e).resolve(result);
 			futureMap.remove(e);
-//		}
+		}
 	}
 
 
 	@Override
 	public void sendBroadcast(Broadcast b) {
-		synchronized (managerMapLock) {
-			while (!managerMap.containsKey(b.getClass())) {
-				try {
-//					System.out.println("wait in sendBroadcast() for subscribe to broadcast "+b.getClass().getName());
-					managerMapLock.wait();
-				} catch (InterruptedException interruptedException) {
-				}
-			}
-			try {
-				BlockingQueue<MicroService> tempQueue = managerMap.get(b.getClass());
-				while (!tempQueue.isEmpty()) {
-					queueManager.get(tempQueue.take()).add(b);
-				}
-			} catch (Exception exp) {}
-//			Iterator<MicroService> microItr = managerMap.get(b.getClass()).iterator();
-//			MicroService tempM = microItr.next();
-//			MicroService tempM2 = tempM;
-//			while (tempM2 != null){
-//				if (microItr.hasNext())
-//					tempM2 = microItr.next();
-//				queueManager.get(tempM).add(b);
-//				tempM = tempM2;
+		if(managerMap.containsKey(b.getClass())){
+//			synchronized (managerMapLock) {
+//			while (!managerMap.containsKey(b.getClass())) {
+//				try {
+////					System.out.println("wait in sendBroadcast() for subscribe to broadcast "+b.getClass().getName());
+//					managerMapLock.wait();
+//				} catch (InterruptedException interruptedException) {
+//				}
 //			}
+			MicroService m = null;
+			BlockingQueue<MicroService> tempQueue;
+			int count;
 
-//			for (MicroService tempM : managerMap.get(b.getClass())) {
-//				BlockingQueue<Message> tempQueue = queueManager.get(tempM);
-//				tempQueue.add(b);
-//				queueManager.get(tempM).add(b);
+		    synchronized (managerMapLock) {
+				tempQueue =new LinkedBlockingQueue<>(managerMap.get(b.getClass()));
+				count = tempQueue.size();
+				//System.out.println(count+" subscribed to brod");
+			}
+
+					for(int i=0; i < count ; i++){
+							try {
+								m = tempQueue.take();
+								tempQueue.add(m);
+							}catch (InterruptedException ex){}
+						synchronized (queueMapLock) {
+							if(m==null){
+								System.out.println("m is null");
+							}
+							if(m!=null) {
+								queueManager.get(m).add(b);
+								queueMapLock.notifyAll();
+							}
+						}
+					}
+			}
+//			synchronized (queueMapLock) {
+//				queueMapLock.notifyAll();
 //			}
-//			List<MicroService> tempList = new LinkedList<>(managerMap.get(b.getClass()));
-//			for (MicroService microService : tempList) {
-//				managerMap.get(b.getClass()).add(microService);
-//			}
-			managerMapLock.notifyAll();
-		}
-		synchronized (queueMapLock){
-			queueMapLock.notifyAll();
-		}
 
 	}
 
 
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
-		Future<T> future = new Future<>();
-		futureMap.put(e, future);
 		synchronized (managerMapLock) {
-			while (!managerMap.containsKey(e.getClass())) {
-				try {
-//					System.out.println("wait in sendEvent() for subscribe to event "+e.getClass().getName());
-					managerMapLock.wait();
-				} catch (InterruptedException exception) {
-				}
-			}
-			if (!managerMap.get(e.getClass()).isEmpty()) { //added cause tempM received null - maybe is not needed after the tests
-				try {
-					MicroService tempM = managerMap.get(e.getClass()).take(); //part 1 of round robin method
-//					BlockingQueue<Message> tempQueue = queueManager.get(tempM);
-					queueManager.get(tempM).add(e);
-					managerMap.get(e.getClass()).add(tempM); //part 2 of round robin method
-					managerMapLock.notifyAll();
-				} catch (Exception exp) {
-				}
+			if (!managerMap.containsKey(e.getClass())) {
+				return null;
 			}
 		}
-		synchronized (queueMapLock){
-			queueMapLock.notifyAll();
-		}
-//		synchronized (futureMapLock) {
+		Future<T> future = new Future<>();
 
-//			futureMapLock.notifyAll();
-			return future;
-//		}
+//			while (!managerMap.containsKey(e.getClass())) {
+//				try {
+////					System.out.println("wait in sendEvent() for subscribe to event "+e.getClass().getName());
+//					managerMapLock.wait();
+//				} catch (InterruptedException exception) {
+//				}
+//			}
+
+		//if (!managerMap.get(e.getClass()).isEmpty()) { //added cause tempM received null - maybe is not needed after the tests
+		MicroService tempM = null;
+		synchronized (managerMapLock) {
+			try {
+				tempM = managerMap.get(e.getClass()).take(); //part 1 of round robin method
+				managerMap.get(e.getClass()).add(tempM); //part 2 of round robin method
+			} catch (InterruptedException ex) {
+			}
+		}
+//					BlockingQueue<Message> tempQueue = queueManager.get(tempM);
+		synchronized (queueMapLock) {
+			if (tempM != null) {
+				queueManager.get(tempM).add(e);
+				queueMapLock.notifyAll();
+			}
+		}
+		synchronized (futureMapLock) {
+			futureMap.put(e, future);
+			futureMapLock.notifyAll();
+		}
+		return future;
 	}
 
 
@@ -174,7 +188,6 @@ public class MessageBusImpl implements MessageBus {
 			queueManager.put(m, tempBQ);
 			queueMapLock.notifyAll();
 		}
-		registered.add(m);
 	}
 
 
@@ -189,11 +202,11 @@ public class MessageBusImpl implements MessageBus {
 			queueManager.remove(m);
 //			System.out.println(m.getName() + " unregistered");
 		}
-		registered.remove(m);
-		if(registered.isEmpty()){
+		if(queueManager.isEmpty()){
 			managerMap.clear();
 			queueManager.clear();
 			futureMap.clear();
+			subscribedCounterBrod = 0;
 		}
 	}
 
@@ -203,6 +216,7 @@ public class MessageBusImpl implements MessageBus {
 		synchronized (queueMapLock) {
 			while (queueManager.get(m).isEmpty()) {
 //				System.out.println(m.getName() + "is waiting in await()");
+				//System.out.println(m.getName()+"wait in awaitMessage");
 				queueMapLock.wait();
 			}
 
@@ -213,5 +227,4 @@ public class MessageBusImpl implements MessageBus {
 			}
 		}
 	}
-
 }

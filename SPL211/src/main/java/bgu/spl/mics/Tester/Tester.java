@@ -325,14 +325,14 @@ public class Tester {
             }
             if (!passedSecondTest) System.out.println("Failed Test - Didn't Clear QUEUE Of Object Upon Unregister");
             else System.out.println("Queue Clear Test Passed!");
-//            Event1 event1 = new Event1();
-//            Event2 event2 = new Event2();
-//            Future<Boolean> testEventListen1 = messageInstance.sendEvent(event1);
-//            Future<Boolean> testEventListen2 = messageInstance.sendEvent(event2);
-//            if (testEventListen1 != null || testEventListen2 != null)
-//                System.out.println("Failed EventList Clear Test - Didn't Clear Event List");
-//            else
-//                System.out.println("EventList Clear Test Passed");
+            Event1 event1 = new Event1();
+            Event2 event2 = new Event2();
+            Future<Boolean> testEventListen1 = messageInstance.sendEvent(event1);
+            Future<Boolean> testEventListen2 = messageInstance.sendEvent(event2);
+            if (testEventListen1 != null || testEventListen2 != null)
+                System.out.println("Failed EventList Clear Test - Didn't Clear Event List");
+            else
+                System.out.println("EventList Clear Test Passed");
             /*
              Multi Threaded Check Against SubscribingToEvents
             */

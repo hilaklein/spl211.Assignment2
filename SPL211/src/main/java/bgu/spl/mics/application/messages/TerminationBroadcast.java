@@ -2,8 +2,12 @@ package bgu.spl.mics.application.messages;
 
 import bgu.spl.mics.Broadcast;
 
-public class TerminationBroadcast<T> implements Broadcast {
+import java.util.concurrent.CountDownLatch;
 
-    /**do we need that class????????????????????*/
-    // Lando can call this class when he is done with bombing
+public class TerminationBroadcast<T> implements Broadcast {
+    public static CountDownLatch terminateCountDown = new CountDownLatch(5);
+
+    public TerminationBroadcast() {
+        terminateCountDown = new CountDownLatch(5);
+    }
 }

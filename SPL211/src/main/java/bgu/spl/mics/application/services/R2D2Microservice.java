@@ -38,6 +38,7 @@ public class R2D2Microservice extends MicroService {
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
+        TerminationBroadcast.terminateCountDown.countDown();
         //System.out.println("r2d2 start init");
         Callback<DeactivationEvent> deactEvent = new Callback<DeactivationEvent>() {
             @Override
@@ -53,6 +54,7 @@ public class R2D2Microservice extends MicroService {
             }
         };
         subscribeEvent(DeactivationEvent.class, deactEvent);
+        DeactivationEvent.countSubscribed.countDown();
     }
 
     @Override

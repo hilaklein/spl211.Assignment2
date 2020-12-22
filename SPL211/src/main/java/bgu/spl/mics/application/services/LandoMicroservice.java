@@ -35,6 +35,7 @@ public class LandoMicroservice  extends MicroService {
             }
         };
         subscribeBroadcast(TerminationBroadcast.class, callTerminate);
+        TerminationBroadcast.terminateCountDown.countDown();
 
         //System.out.println( "lando start init");
         Callback<BombDestroyerEvent> bombEvent = new Callback<BombDestroyerEvent>() {
@@ -48,6 +49,7 @@ public class LandoMicroservice  extends MicroService {
             }
         };
         subscribeEvent(BombDestroyerEvent.class, bombEvent);
+        BombDestroyerEvent.countSubscribed.countDown();
     }
 
     @Override

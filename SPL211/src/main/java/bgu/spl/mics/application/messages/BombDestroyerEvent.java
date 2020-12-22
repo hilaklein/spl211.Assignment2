@@ -2,6 +2,12 @@ package bgu.spl.mics.application.messages;
 
 import bgu.spl.mics.Event;
 
-public class BombDestroyerEvent implements Event<Boolean> {
+import java.util.concurrent.CountDownLatch;
 
+public class BombDestroyerEvent implements Event<Boolean> {
+    public static CountDownLatch countSubscribed = new CountDownLatch(1);
+
+    public BombDestroyerEvent() {
+        countSubscribed = new CountDownLatch(1);
+    }
 }

@@ -54,16 +54,18 @@ public class Main {
 
 		tHanSolo.start();
 		tC3po.start();
-		tLeia.start();
 		tR2d2.start();
 		tLando.start();
+		tLeia.start();
+
 
 		try {
-			tC3po.join();
 			tHanSolo.join();
-			tLeia.join();
+			tC3po.join();
 			tR2d2.join();
 			tLando.join();
+			tLeia.join();
+
 		} catch (InterruptedException e) {
 			System.out.println("main : try to join(): " + e.getMessage());
 		}

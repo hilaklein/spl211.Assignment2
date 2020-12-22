@@ -33,6 +33,7 @@ public class Future<T> {
 	public synchronized T get() {
 		while (!isDone) {
 			try {
+				//System.out.println(Thread.currentThread().getName()+"wait in futures get");
 				this.wait(); // waiting till receiving a notification that isDone has been changed
 			} catch (InterruptedException ignored){}
 		}

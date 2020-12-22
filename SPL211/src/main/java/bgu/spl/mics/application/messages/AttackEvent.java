@@ -3,11 +3,13 @@ package bgu.spl.mics.application.messages;
 import bgu.spl.mics.Event;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class AttackEvent implements Event<Boolean> {
 	private boolean result;
     private int duration;
     private List<Integer> ewokSerials;
+    public static CountDownLatch countSubscribed = new CountDownLatch(2);
 
 
     public Integer getDuration() {
@@ -23,6 +25,7 @@ public class AttackEvent implements Event<Boolean> {
     }
 
     public AttackEvent(int duration, List<Integer> ewoksId) {
+        countSubscribed = new CountDownLatch(2);
         this.result = false;
         this.duration = duration;
         this.ewokSerials = ewoksId;
